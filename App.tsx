@@ -142,6 +142,7 @@ const App: React.FC = () => {
   const [isMonitorVisible, setIsMonitorVisible] = useState(false);
   const [showSinglePageInModal, setShowSinglePageInModal] = useState(false);
   const [modalZoom, setModalZoom] = useState(1);
+  const [isAdjusting, setIsAdjusting] = useState(false);
 
   // Ajustar posição do monitor flutuante baseado no scroll e visibilidade
   useEffect(() => {
@@ -222,7 +223,10 @@ const App: React.FC = () => {
     const { name, value } = e.target;
     setData(prev => ({ ...prev, [name]: value }));
     // Auto-show monitor ao editar texto em mobile
-    if (window.innerWidth < 768) setIsMonitorVisible(true);
+    if (window.innerWidth < 768) {
+      setIsMonitorVisible(true);
+      setIsAdjusting(true);
+    }
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -235,12 +239,18 @@ const App: React.FC = () => {
     const { name, value } = e.target;
     setData(prev => ({ ...prev, [name]: parseInt(value) }));
     // Ajustes de escala/tamanho ativam o monitor automaticamente no mobile
-    if (window.innerWidth < 768) setIsMonitorVisible(true);
+    if (window.innerWidth < 768) {
+      setIsMonitorVisible(true);
+      setIsAdjusting(true);
+    }
   };
 
   const setTextAlign = (align: 'left' | 'center' | 'right' | 'justify') => {
     setData(prev => ({ ...prev, frontTextAlign: align }));
-    if (window.innerWidth < 768) setIsMonitorVisible(true);
+    if (window.innerWidth < 768) {
+      setIsMonitorVisible(true);
+      setIsAdjusting(true);
+    }
   };
 
   const toggleBoldVariable = (variable: string) => {
@@ -443,7 +453,14 @@ const App: React.FC = () => {
   const handleZoom = (delta: number) => setZoom(prev => Math.min(Math.max(prev + delta, 0.15), 1.5));
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden bg-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden bg-gray-100 relative">
+      {/* Overlay de Foco para Ajustes Mobile */}
+      {isAdjusting && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[35] animate-fadeIn md:hidden"
+          onClick={() => setIsAdjusting(false)}
+        />
+      )}
       {isPreviewOpen && (
         <div className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-2xl flex flex-col no-print animate-fadeIn">
           {/* Cabeçalho Fixo do Modal */}
@@ -727,8 +744,11 @@ const App: React.FC = () => {
                 </div>
               </section>
 
-              <section className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h3 className="text-xs font-bold text-gray-600 uppercase mb-4 flex items-center gap-2"><i className="fa-solid fa-up-down-left-right"></i> Ajustes de Posição (Layout)</h3>
+              <section className={`bg-gray-50 p-4 rounded-lg border border-gray-200 transition-all duration-300 ${isAdjusting ? 'relative z-[41] shadow-2xl bg-white' : ''}`}>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xs font-bold text-gray-600 uppercase flex items-center gap-2"><i className="fa-solid fa-up-down-left-right"></i> Ajustes de Posição (Layout)</h3>
+                  {isAdjusting && <button onClick={() => setIsAdjusting(false)} className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200">CONCLUIR</button>}
+                </div>
                 <div className="space-y-4">
                   <div className="bg-white p-3 rounded border border-gray-200 space-y-3">
                     <p className="text-[10px] font-bold text-blue-900 uppercase">VERSO (Pág 2)</p>
@@ -789,8 +809,11 @@ const App: React.FC = () => {
                 </div>
               </section>
 
-              <section className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h3 className="text-xs font-bold text-gray-600 uppercase mb-4 flex items-center gap-2"><i className="fa-solid fa-font"></i> Tamanhos de Fontes</h3>
+              <section className={`bg-gray-50 p-4 rounded-lg border border-gray-200 transition-all duration-300 ${isAdjusting ? 'relative z-[41] shadow-2xl bg-white' : ''}`}>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xs font-bold text-gray-600 uppercase flex items-center gap-2"><i className="fa-solid fa-font"></i> Tamanhos de Fontes</h3>
+                  {isAdjusting && <button onClick={() => setIsAdjusting(false)} className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200">CONCLUIR</button>}
+                </div>
                 <div className="space-y-4">
                   <div className="bg-white p-3 rounded border border-gray-200 space-y-3">
                     <p className="text-[10px] font-bold text-blue-900 uppercase">FRENTE</p>
@@ -975,7 +998,7 @@ const App: React.FC = () => {
                 </div>
 
                 <button
-                  onClick={(e) => { e.stopPropagation(); setIsMonitorVisible(false); }}
+                  onClick={(e) => { e.stopPropagation(); setIsMonitorVisible(false); setIsAdjusting(false); }}
                   className="pointer-events-auto ml-1 bg-white/20 hover:bg-white/40 w-4 h-4 rounded-full flex items-center justify-center transition-colors"
                 >
                   <i className="fa-solid fa-xmark text-[8px]"></i>
