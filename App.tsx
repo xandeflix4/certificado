@@ -393,7 +393,7 @@ const App: React.FC = () => {
   const handleZoom = (delta: number) => setZoom(prev => Math.min(Math.max(prev + delta, 0.15), 1.5));
 
   return (
-    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
+    <div className="flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden bg-gray-100">
       {isPreviewOpen && (
         <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 animate-fadeIn">
           <div className="w-full max-w-7xl flex justify-between items-center mb-6">
@@ -432,7 +432,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <div className="w-full md:w-[450px] bg-white shadow-xl flex flex-col h-screen no-print z-20 overflow-hidden">
+      <div className="w-full md:w-[450px] bg-white shadow-xl flex flex-col md:h-full no-print z-20 shrink-0">
         <div className="p-6 bg-blue-900 text-white">
           <h1 className="text-xl font-bold flex items-center gap-2">
             <i className="fa-solid fa-graduation-cap"></i>
@@ -463,7 +463,7 @@ const App: React.FC = () => {
             Visual
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-300">
+        <div className="flex-1 p-6 md:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
           {activeTab === 'dados' && (
             <div className="animate-fadeIn space-y-6">
               <section>
@@ -763,7 +763,7 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 bg-gray-200 p-8 overflow-auto flex flex-col items-center relative">
+      <div className="w-full flex-grow flex flex-col items-center justify-center bg-gray-200 p-4 md:p-8 md:overflow-hidden no-print min-h-[500px]">
         <div className="mb-6 flex flex-col items-center gap-4 no-print sticky top-0 z-30 w-full">
           <div className="flex flex-wrap items-center justify-center gap-4 bg-white/90 backdrop-blur-md p-3 rounded-xl shadow-xl border border-white/20">
             <div className={`flex items-center gap-3 bg-gray-50 px-3 py-1.5 rounded-lg border ${data.students.length === 0 ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
