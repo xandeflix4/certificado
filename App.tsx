@@ -440,10 +440,28 @@ const App: React.FC = () => {
           </h1>
           <p className="text-xs opacity-75">Configurador de Certificados</p>
         </div>
-        <div className="flex bg-gray-100 border-b">
-          <button onClick={() => setActiveTab('dados')} className={`flex-1 py-3 text-xs font-bold uppercase transition-colors ${activeTab === 'dados' ? 'bg-white border-t-2 border-blue-900 text-blue-900' : 'text-gray-500'}`}>Alunos & Curso</button>
-          <button onClick={() => setActiveTab('grade')} className={`flex-1 py-3 text-xs font-bold uppercase transition-colors ${activeTab === 'grade' ? 'bg-white border-t-2 border-blue-900 text-blue-900' : 'text-gray-500'}`}>Grade</button>
-          <button onClick={() => setActiveTab('visual')} className={`flex-1 py-3 text-xs font-bold uppercase transition-colors ${activeTab === 'visual' ? 'bg-white border-t-2 border-blue-900 text-blue-900' : 'text-gray-500'}`}>Visual</button>
+        <div className="flex p-2 bg-gray-100 gap-1 border-b shadow-sm sticky top-0 z-10">
+          <button
+            onClick={() => setActiveTab('dados')}
+            className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'dados' ? 'bg-blue-900 text-white shadow-md transform scale-105' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+          >
+            <i className="fa-solid fa-user-graduate text-sm"></i>
+            Alunos & Curso
+          </button>
+          <button
+            onClick={() => setActiveTab('grade')}
+            className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'grade' ? 'bg-blue-900 text-white shadow-md transform scale-105' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+          >
+            <i className="fa-solid fa-list-check text-sm"></i>
+            Grade
+          </button>
+          <button
+            onClick={() => setActiveTab('visual')}
+            className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'visual' ? 'bg-blue-900 text-white shadow-md transform scale-105' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+          >
+            <i className="fa-solid fa-brush text-sm"></i>
+            Visual
+          </button>
         </div>
         <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-300">
           {activeTab === 'dados' && (
