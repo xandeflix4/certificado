@@ -133,6 +133,7 @@ const App: React.FC = () => {
   const [isRotated, setIsRotated] = useState(false);
   const [miniPreviewPos, setMiniPreviewPos] = useState<'top' | 'bottom'>('bottom');
   const [isMonitorVisible, setIsMonitorVisible] = useState(false);
+  const [showSinglePageInModal, setShowSinglePageInModal] = useState(false);
 
   // Ajustar posição do monitor flutuante baseado no scroll e visibilidade
   useEffect(() => {
@@ -439,8 +440,12 @@ const App: React.FC = () => {
         <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 animate-fadeIn">
           <div className="w-full max-w-7xl flex justify-between items-center mb-6">
             <div className="text-white">
-              <h2 className="text-xl font-bold uppercase tracking-widest text-blue-400">Pré-visualização Final</h2>
-              <p className="text-xs text-gray-400">Ajustado para caber na tela</p>
+              <h2 className="text-xl font-bold uppercase tracking-widest text-blue-400">
+                {showSinglePageInModal ? 'Lupa de Ajuste Mobile' : 'Pré-visualização Final'}
+              </h2>
+              <p className="text-xs text-gray-400">
+                {showSinglePageInModal ? `Visualizando ${previewPage === 1 ? 'Frente' : 'Verso'}` : 'Ajustado para caber na tela'}
+              </p>
             </div>
             <div className="flex gap-2 md:gap-4">
               <button
@@ -453,33 +458,37 @@ const App: React.FC = () => {
               <button onClick={exportAllToPDF} className="bg-green-600 text-white px-4 md:px-8 py-3 rounded-full font-bold shadow-2xl hover:bg-green-700 transition-all flex items-center gap-2 transform hover:scale-105 active:scale-95">
                 <i className="fa-solid fa-file-pdf"></i> <span className="hidden md:inline">Exportar Tudo</span>
               </button>
-              <button onClick={() => { setIsPreviewOpen(false); setIsRotated(false); }} className="bg-white/10 hover:bg-white/20 text-white w-12 h-12 rounded-full flex items-center justify-center transition-all">
+              <button onClick={() => { setIsPreviewOpen(false); setIsRotated(false); setShowSinglePageInModal(false); }} className="bg-white/10 hover:bg-white/20 text-white w-12 h-12 rounded-full flex items-center justify-center transition-all">
                 <i className="fa-solid fa-xmark text-2xl"></i>
               </button>
             </div>
           </div>
           <div className="relative w-full flex-grow flex items-center justify-center overflow-auto scrollbar-hide py-20 px-4">
             <div
-              className="flex flex-col xl:flex-row items-center justify-center gap-12 transition-all duration-500 ease-in-out"
+              className={`flex flex-col items-center justify-center gap-12 transition-all duration-500 ease-in-out ${!showSinglePageInModal ? 'xl:flex-row' : ''}`}
               style={{
                 transform: `scale(${modalScale}) ${isRotated ? 'rotate(90deg)' : ''}`,
                 transformOrigin: 'center center',
-                minWidth: isRotated ? '794px' : '1123px',
-                minHeight: isRotated ? '1123px' : '794px'
+                minWidth: isRotated ? (showSinglePageInModal ? '794px' : '1123px') : (showSinglePageInModal ? '1123px' : '2350px'),
+                minHeight: isRotated ? (showSinglePageInModal ? '1123px' : '2350px') : (showSinglePageInModal ? '794px' : '1123px')
               }}
             >
-              <div className="flex flex-col items-center gap-4">
-                <span className="text-white/30 font-bold uppercase tracking-tighter text-sm">Página 1: Frente</span>
-                <div className="shadow-[0_0_100px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden border border-white/10">
-                  <CertificatePreview data={data} student={currentStudent} page={1} />
+              {(!showSinglePageInModal || previewPage === 1) && (
+                <div className="flex flex-col items-center gap-4">
+                  <span className="text-white/30 font-bold uppercase tracking-tighter text-sm">Página 1: Frente</span>
+                  <div className="shadow-[0_0_100px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden border border-white/10">
+                    <CertificatePreview data={data} student={currentStudent} page={1} />
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-col items-center gap-4">
-                <span className="text-white/30 font-bold uppercase tracking-tighter text-sm">Página 2: Verso</span>
-                <div className="shadow-[0_0_100px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden border border-white/10">
-                  <CertificatePreview data={data} student={null} page={2} />
+              )}
+              {(!showSinglePageInModal || previewPage === 2) && (
+                <div className="flex flex-col items-center gap-4">
+                  <span className="text-white/30 font-bold uppercase tracking-tighter text-sm">Página 2: Verso</span>
+                  <div className="shadow-[0_0_100px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden border border-white/10">
+                    <CertificatePreview data={data} student={null} page={2} />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -867,12 +876,23 @@ const App: React.FC = () => {
             className={`md:hidden fixed z-[45] left-0 right-0 transition-all duration-500 pointer-events-none ${miniPreviewPos === 'bottom' ? 'bottom-24 animate-slideInUp' : 'top-32 animate-slideInDown'}`}
           >
             <div className="relative mx-auto flex flex-col items-center">
-              <div className="bg-white/95 backdrop-blur-md p-1 rounded-xl border-2 border-blue-900/40 shadow-2xl scale-[0.32] origin-center" style={{ width: '1123px', height: '794px' }}>
+              <div
+                onClick={() => {
+                  setIsPreviewOpen(true);
+                  setIsRotated(true);
+                  setShowSinglePageInModal(true);
+                }}
+                className="bg-white/95 backdrop-blur-md p-1 rounded-xl border-2 border-blue-900/40 shadow-2xl scale-[0.32] origin-center pointer-events-auto cursor-pointer active:scale-[0.30] transition-transform"
+                style={{ width: '1123px', height: '794px' }}
+              >
                 <CertificatePreview data={data} student={previewPage === 1 ? currentStudent : null} page={previewPage} />
+                <div className="absolute inset-0 bg-blue-900/0 hover:bg-blue-900/10 flex items-center justify-center transition-colors">
+                  <i className="fa-solid fa-maximize text-blue-900 text-6xl opacity-0 hover:opacity-100 transition-opacity"></i>
+                </div>
               </div>
-              <div className="mt-[-250px] bg-blue-900/90 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-xl border border-white/20 backdrop-blur-sm flex items-center gap-1.5">
+              <div className="mt-[-250px] bg-blue-900/90 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-xl border border-white/20 backdrop-blur-sm flex items-center gap-1.5 shadow-blue-900/50">
                 <i className="fa-solid fa-tower-broadcast animate-pulse text-blue-400"></i>
-                <span className="tracking-tighter uppercase whitespace-nowrap">Monitor</span>
+                <span className="tracking-tighter uppercase whitespace-nowrap">Monitor / Clique Ampliar</span>
 
                 <div className="flex items-center bg-white/10 rounded-md p-0.5 ml-1 pointer-events-auto border border-white/10">
                   <button
