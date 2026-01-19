@@ -131,6 +131,17 @@ const App: React.FC = () => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [modalScale, setModalScale] = useState(0.8);
   const [isRotated, setIsRotated] = useState(false);
+  const [miniPreviewPos, setMiniPreviewPos] = useState<'top' | 'bottom'>('bottom');
+
+  // Ajustar posição do monitor flutuante baseado no scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      // No mobile, se descer > 450px, joga o monitor pro topo (lado oposto ao scroll)
+      setMiniPreviewPos(window.scrollY > 450 ? 'top' : 'bottom');
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -831,7 +842,22 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Botão Flutuante Mobile */}
+        {/* Monitor Flutuante Mobile Inteligente (Lado Oposto ao Scroll) */}
+        <div
+          className={`md:hidden fixed z-[45] left-0 right-0 transition-all duration-500 pointer-events-none ${miniPreviewPos === 'bottom' ? 'bottom-24 animate-slideInUp' : 'top-32 animate-slideInDown'}`}
+        >
+          <div className="relative mx-auto flex flex-col items-center">
+            <div className="bg-white/95 backdrop-blur-md p-1 rounded-xl border-2 border-blue-900/40 shadow-2xl scale-[0.32] origin-center" style={{ width: '1123px', height: '794px' }}>
+              <CertificatePreview data={data} student={previewPage === 1 ? currentStudent : null} page={previewPage} />
+            </div>
+            <div className="mt-[-250px] bg-blue-900/90 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-xl border border-white/20 backdrop-blur-sm">
+              <i className="fa-solid fa-tower-broadcast animate-pulse mr-1"></i>
+              MONITOR EM TEMPO REAL
+            </div>
+          </div>
+        </div>
+
+        {/* Botão Flutuante Mobile (MODO RETRATO) */}
         <button
           onClick={() => { setIsPreviewOpen(true); setIsRotated(true); }}
           className="md:hidden fixed bottom-6 right-6 z-50 w-16 h-16 bg-blue-900 text-white rounded-full shadow-2xl flex flex-col items-center justify-center animate-bounce border-2 border-white"
