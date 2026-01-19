@@ -127,6 +127,13 @@ const App: React.FC = () => {
   const [previewPage, setPreviewPage] = useState<1 | 2>(1);
   const [currentStudentIdx, setCurrentStudentIdx] = useState(0);
   const [zoom, setZoom] = useState(0.5);
+
+  // Efeito para definir zoom inicial de 40% apenas em mobile
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setZoom(0.4);
+    }
+  }, []);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [modalScale, setModalScale] = useState(0.8);
