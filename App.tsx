@@ -10,8 +10,6 @@ import { fileToBase64 } from './utils/helpers';
 import { isValidCPF, isValidCNPJ, validateCertificateData, formatValidationErrors } from './utils/validators';
 import { saveCertificateData, loadCertificateData, hasSavedData, clearCertificateData } from './utils/storage';
 import { supabase } from './src/supabaseClient';
-import Auth from './src/components/Auth';
-import { Session } from '@supabase/supabase-js';
 
 const App: React.FC = () => {
   const [data, setData] = useState<CertificateData>({
@@ -63,24 +61,13 @@ const App: React.FC = () => {
     frontBorderWidth: 16,
   });
 
-  const [session, setSession] = useState<Session | null>(null);
+  // ID fixo compartilhado - todos os usuários acessam os mesmos dados
+  const SHARED_USER_ID = '00000000-0000-0000-0000-000000000000';
   const [loadingCloud, setLoadingCloud] = useState(false);
 
-  // Gerenciamento de Sessão e Carregamento Inicial
+  // Carregamento inicial dos dados
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) loadCloudData(session.user.id);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session) loadCloudData(session.user.id);
-    });
-
-    return () => subscription.unsubscribe();
+    loadCloudData(SHARED_USER_ID);
   }, []);
 
   // Carregar dados da nuvem
@@ -99,10 +86,8 @@ const App: React.FC = () => {
       }
 
       if (userData && userData.content) {
-        // Mesclar dados da nuvem mantendo funções locais se necessário
         setData(prev => ({ ...prev, ...userData.content }));
       } else if (hasSavedData()) {
-        // Se não tem na nuvem mas tem local (primeiro login?), migrar local -> nuvem
         const localData = loadCertificateData();
         if (localData) {
           setData(localData);
@@ -116,7 +101,7 @@ const App: React.FC = () => {
     }
   };
 
-  // Salvar na nuvem (Debounced ou no useEffect do data)
+  // Salvar na nuvem
   const saveCloudData = async (newData: CertificateData, userId: string) => {
     try {
       await supabase.from('user_data').upsert({
@@ -129,20 +114,14 @@ const App: React.FC = () => {
     }
   };
 
-  // Substituir o useEffect de salvamento local para salvar na nuvem TAMBÉM
+  // Auto-save
   useEffect(() => {
-    if (session?.user?.id) {
-      // Salva na nuvem (idealmente seria com debounce, mas vamos simplificar)
-      // Usaremos um timeout para não spammar o banco
-      const timer = setTimeout(() => {
-        saveCloudData(data, session.user.id);
-      }, 2000);
-      return () => clearTimeout(timer);
-    } else {
-      // Fallback local
-      saveCertificateData(data);
-    }
-  }, [data, session]);
+    const timer = setTimeout(() => {
+      saveCloudData(data, SHARED_USER_ID);
+      saveCertificateData(data); // Backup local também
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [data]);
 
   const [activeTab, setActiveTab] = useState<'dados' | 'visual' | 'grade'>('dados');
   const [previewPage, setPreviewPage] = useState<1 | 2>(1);
@@ -413,11 +392,6 @@ const App: React.FC = () => {
   const currentStudent = data.students[currentStudentIdx] || null;
   const handleZoom = (delta: number) => setZoom(prev => Math.min(Math.max(prev + delta, 0.15), 1.5));
 
-  // Se não estiver logado, mostra tela de Login
-  if (!session) {
-    return <Auth />;
-  }
-
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       {isPreviewOpen && (
@@ -459,22 +433,12 @@ const App: React.FC = () => {
       )}
 
       <div className="w-full md:w-[450px] bg-white shadow-xl flex flex-col h-screen no-print z-20 overflow-hidden">
-        <div className="p-6 bg-blue-900 text-white flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold flex items-center gap-2">
-              <i className="fa-solid fa-graduation-cap"></i>
-              CertificaMaster
-            </h1>
-            <p className="text-xs opacity-75">Configurador de Certificados</p>
-            <p className="text-[10px] opacity-50 mt-1">{session?.user?.email}</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-all"
-            title="Sair"
-          >
-            <i className="fa-solid fa-right-from-bracket"></i>
-          </button>
+        <div className="p-6 bg-blue-900 text-white">
+          <h1 className="text-xl font-bold flex items-center gap-2">
+            <i className="fa-solid fa-graduation-cap"></i>
+            CertificaMaster
+          </h1>
+          <p className="text-xs opacity-75">Configurador de Certificados</p>
         </div>
         <div className="flex bg-gray-100 border-b">
           <button onClick={() => setActiveTab('dados')} className={`flex-1 py-3 text-xs font-bold uppercase transition-colors ${activeTab === 'dados' ? 'bg-white border-t-2 border-blue-900 text-blue-900' : 'text-gray-500'}`}>Alunos & Curso</button>
