@@ -414,7 +414,7 @@ const App: React.FC = () => {
         await Promise.all(promises);
       };
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
       const capturePage = async (elementId: string) => {
         const element = document.getElementById(elementId);
         if (!element) return null;
@@ -437,13 +437,14 @@ const App: React.FC = () => {
         const canvas1 = await capturePage(`export-p1-${student.id}`);
         if (canvas1) {
           if (i > 0) pdf.addPage();
-          pdf.addImage(canvas1.toDataURL('image/png'), 'PNG', 0, 0, 297, 210);
+          // Usar JPEG com qualidade 0.8 para reduzir drasticamente o tamanho do arquivo
+          pdf.addImage(canvas1.toDataURL('image/jpeg', 0.8), 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
         }
       }
       const canvas2 = await capturePage('export-p2-generic');
       if (canvas2) {
         pdf.addPage();
-        pdf.addImage(canvas2.toDataURL('image/png'), 'PNG', 0, 0, 297, 210);
+        pdf.addImage(canvas2.toDataURL('image/jpeg', 0.8), 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
       }
       pdf.save(`Certificados_${data.courseName.replace(/\s+/g, '_') || 'Lote'}.pdf`);
       alert(`✅ PDF gerado com sucesso!\n\n${data.students.length} certificado(s) exportado(s).`);
@@ -957,6 +958,20 @@ const App: React.FC = () => {
               <div className="flex flex-col items-center min-w-[50px] md:min-w-[60px] px-1"><span className="text-[8px] md:text-[10px] uppercase font-bold text-blue-400">Zoom</span><span className="text-xs md:text-sm font-bold text-blue-900">{Math.round(zoom * 100)}%</span></div>
               <button onClick={() => handleZoom(0.1)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-white border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-600 hover:text-white transition-all"><i className="fa-solid fa-magnifying-glass-plus text-sm md:text-lg"></i></button>
             </div>
+
+            <button
+              onClick={exportAllToPDF}
+              disabled={isGenerating || data.students.length === 0}
+              className="px-4 md:px-6 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-black text-[10px] md:text-xs shadow-lg hover:shadow-green-500/30 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50 disabled:grayscale"
+            >
+              {isGenerating ? (
+                <i className="fa-solid fa-circle-notch animate-spin"></i>
+              ) : (
+                <i className="fa-solid fa-file-pdf"></i>
+              )}
+              <span className="hidden md:inline">GERAR PDF FINAL</span>
+              <span className="md:hidden">PDF</span>
+            </button>
           </div>
         </div>
 
