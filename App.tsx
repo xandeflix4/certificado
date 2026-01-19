@@ -552,9 +552,9 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <div className="w-full md:w-[450px] bg-white shadow-xl flex flex-col md:h-full no-print z-20 shrink-0">
+      <div className={`w-full md:w-[450px] bg-white shadow-xl flex flex-col md:h-full no-print shrink-0 transition-all duration-300 ${isAdjusting ? 'relative z-[40]' : 'z-20'}`}>
         <div className="sticky top-0 z-30 bg-white shadow-md md:relative md:shadow-none">
-          <div className="p-4 md:p-6 bg-blue-900 text-white flex justify-between items-center">
+          <div className={`p-4 md:p-6 bg-blue-900 text-white flex justify-between items-center transition-opacity ${isAdjusting ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
             <div>
               <h1 className="text-lg md:text-xl font-bold flex items-center gap-2">
                 <i className="fa-solid fa-graduation-cap"></i>
@@ -564,7 +564,7 @@ const App: React.FC = () => {
             </div>
             <div className="md:hidden bg-white/20 px-2 py-1 rounded text-[10px] font-bold">MOBILE</div>
           </div>
-          <div className="flex w-full p-2 bg-gray-100/50 gap-1.5 border-b backdrop-blur-sm">
+          <div className={`flex w-full p-2 bg-gray-100/50 gap-1.5 border-b backdrop-blur-sm transition-opacity ${isAdjusting ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
             <button
               onClick={() => setActiveTab('dados')}
               className={`flex-1 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase transition-all duration-300 flex flex-col items-center gap-1.5 border-2 ${activeTab === 'dados' ? 'bg-white text-blue-900 border-blue-900 shadow-[0_4px_12px_rgba(30,58,138,0.15)] transform scale-[1.02]' : 'bg-transparent text-gray-400 border-transparent hover:text-gray-600 hover:bg-gray-200/50'}`}
@@ -591,7 +591,7 @@ const App: React.FC = () => {
         <div className="flex-1 p-6 md:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
           {activeTab === 'dados' && (
             <div className="animate-fadeIn space-y-6">
-              <section>
+              <section className={`transition-opacity duration-300 ${(isAdjusting && activeSection !== 'dados') ? 'opacity-30' : 'opacity-100'}`}>
                 <h2 className="text-sm font-bold text-gray-500 uppercase mb-4 flex items-center gap-2"><i className="fa-solid fa-users"></i> Alunos</h2>
                 <div className="grid grid-cols-2 gap-2 mb-2">
                   <input type="text" placeholder="Nome Completo" value={newStudentName} onChange={(e) => setNewStudentName(e.target.value)} className="px-3 py-2 text-sm border rounded bg-white focus:ring-2 focus:ring-blue-500 outline-none" />
@@ -628,7 +628,7 @@ const App: React.FC = () => {
                 </div>
               </section>
 
-              <section className="pt-4 border-t">
+              <section className={`pt-4 border-t transition-opacity duration-300 ${isAdjusting ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
                 <h2 className="text-sm font-bold text-gray-500 uppercase mb-4 flex items-center gap-2"><i className="fa-solid fa-chalkboard-user"></i> Instrutores</h2>
                 <div className="space-y-2 mb-2">
                   <input type="text" placeholder="Nome do Instrutor" value={newInstructorName} onChange={(e) => setNewInstructorName(e.target.value)} className="w-full px-3 py-2 text-sm border rounded bg-white focus:ring-2 focus:ring-blue-500 outline-none" />
@@ -754,7 +754,7 @@ const App: React.FC = () => {
                 </div>
               </section>
 
-              <section className={`bg-gray-50 p-4 rounded-lg border border-gray-200 transition-all duration-300 ${activeSection === 'layout' && isAdjusting ? 'relative z-[41] shadow-2xl bg-white border-blue-500' : ''}`}>
+              <section className={`bg-gray-50 p-4 rounded-lg border border-gray-200 transition-all duration-300 ${activeSection === 'layout' && isAdjusting ? 'relative z-[41] shadow-2xl bg-white border-blue-500 ring-4 ring-blue-500/10' : (isAdjusting ? 'opacity-20 pointer-events-none' : 'opacity-100')}`}>
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xs font-bold text-gray-600 uppercase flex items-center gap-2"><i className="fa-solid fa-up-down-left-right"></i> Ajustes de Posição (Layout)</h3>
                   {activeSection === 'layout' && isAdjusting && <button onClick={() => { setIsAdjusting(false); setActiveSection(null); }} className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200">CONCLUIR</button>}
@@ -795,7 +795,7 @@ const App: React.FC = () => {
               </section>
 
               {/* SEÇÃO DE NEGRITO EM VARIÁVEIS */}
-              <section className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <section className={`bg-gray-50 p-4 rounded-lg border border-gray-200 transition-all duration-300 ${isAdjusting ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
                 <h3 className="text-xs font-bold text-gray-600 uppercase mb-4 flex items-center gap-2">
                   <i className="fa-solid fa-bold"></i> Estilo de Texto (Destaque)
                 </h3>
@@ -819,7 +819,7 @@ const App: React.FC = () => {
                 </div>
               </section>
 
-              <section className={`bg-gray-50 p-4 rounded-lg border border-gray-200 transition-all duration-300 ${activeSection === 'fontes' && isAdjusting ? 'relative z-[41] shadow-2xl bg-white border-blue-500' : ''}`}>
+              <section className={`bg-gray-50 p-4 rounded-lg border border-gray-200 transition-all duration-300 ${activeSection === 'fontes' && isAdjusting ? 'relative z-[41] shadow-2xl bg-white border-blue-500 ring-4 ring-blue-500/10' : (isAdjusting ? 'opacity-20 pointer-events-none' : 'opacity-100')}`}>
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xs font-bold text-gray-600 uppercase flex items-center gap-2"><i className="fa-solid fa-font"></i> Tamanhos de Fontes</h3>
                   {activeSection === 'fontes' && isAdjusting && <button onClick={() => { setIsAdjusting(false); setActiveSection(null); }} className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200">CONCLUIR</button>}
@@ -893,7 +893,7 @@ const App: React.FC = () => {
             </div>
           )}
         </div>
-        <div className="p-4 md:p-6 border-t bg-white flex flex-col gap-3 shrink-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
+        <div className={`p-4 md:p-6 border-t bg-white flex flex-col gap-3 shrink-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.02)] transition-opacity duration-300 ${isAdjusting ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
           <button
             onClick={() => {
               const shouldClear = window.confirm('🗑️ Limpar todos os dados?\n\nIsso irá remover:\n• Todos os alunos\n• Configurações visuais\n• Grade curricular\n• Dados salvos\n\nEsta ação não pode ser desfeita!');
