@@ -132,11 +132,11 @@ const App: React.FC = () => {
   const [modalScale, setModalScale] = useState(0.8);
   const [isRotated, setIsRotated] = useState(false);
   const [miniPreviewPos, setMiniPreviewPos] = useState<'top' | 'bottom'>('bottom');
+  const [isMonitorVisible, setIsMonitorVisible] = useState(false);
 
-  // Ajustar posição do monitor flutuante baseado no scroll
+  // Ajustar posição do monitor flutuante baseado no scroll e visibilidade
   useEffect(() => {
     const handleScroll = () => {
-      // No mobile, se descer > 450px, joga o monitor pro topo (lado oposto ao scroll)
       setMiniPreviewPos(window.scrollY > 450 ? 'top' : 'bottom');
     };
     window.addEventListener('scroll', handleScroll);
@@ -212,20 +212,26 @@ const App: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setData(prev => ({ ...prev, [name]: value }));
+    // Auto-show monitor ao editar texto em mobile
+    if (window.innerWidth < 768) setIsMonitorVisible(true);
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
     setData(prev => ({ ...prev, [name]: checked }));
+    if (window.innerWidth < 768) setIsMonitorVisible(true);
   };
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setData(prev => ({ ...prev, [name]: parseInt(value) }));
+    // Ajustes de escala/tamanho ativam o monitor automaticamente no mobile
+    if (window.innerWidth < 768) setIsMonitorVisible(true);
   };
 
   const setTextAlign = (align: 'left' | 'center' | 'right' | 'justify') => {
     setData(prev => ({ ...prev, frontTextAlign: align }));
+    if (window.innerWidth < 768) setIsMonitorVisible(true);
   };
 
   const toggleBoldVariable = (variable: string) => {
@@ -238,6 +244,7 @@ const App: React.FC = () => {
           : [...prev.boldVariables, variable]
       };
     });
+    if (window.innerWidth < 768) setIsMonitorVisible(true);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'bgImage' | 'signatureImage' | 'digitalSeal') => {
@@ -245,6 +252,7 @@ const App: React.FC = () => {
     if (file) {
       const base64 = await fileToBase64(file);
       setData(prev => ({ ...prev, [field]: base64 }));
+      if (window.innerWidth < 768) setIsMonitorVisible(true);
     }
   };
 
@@ -842,20 +850,39 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Monitor Flutuante Mobile Inteligente (Lado Oposto ao Scroll) */}
-        <div
-          className={`md:hidden fixed z-[45] left-0 right-0 transition-all duration-500 pointer-events-none ${miniPreviewPos === 'bottom' ? 'bottom-24 animate-slideInUp' : 'top-32 animate-slideInDown'}`}
+        {/* Botão Lateral para Toggle do Monitor (Apenas Mobile) */}
+        <button
+          onClick={() => setIsMonitorVisible(!isMonitorVisible)}
+          className={`md:hidden fixed left-0 top-1/2 -translate-y-1/2 z-50 bg-blue-900 text-white p-2.5 rounded-r-2xl shadow-2xl transition-all duration-500 border-2 border-l-0 border-white/20 flex items-center justify-center ${isMonitorVisible ? 'bg-blue-600' : 'bg-blue-900 opacity-80'}`}
         >
-          <div className="relative mx-auto flex flex-col items-center">
-            <div className="bg-white/95 backdrop-blur-md p-1 rounded-xl border-2 border-blue-900/40 shadow-2xl scale-[0.32] origin-center" style={{ width: '1123px', height: '794px' }}>
-              <CertificatePreview data={data} student={previewPage === 1 ? currentStudent : null} page={previewPage} />
-            </div>
-            <div className="mt-[-250px] bg-blue-900/90 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-xl border border-white/20 backdrop-blur-sm">
-              <i className="fa-solid fa-tower-broadcast animate-pulse mr-1"></i>
-              MONITOR EM TEMPO REAL
+          <div className="flex flex-col items-center gap-2">
+            <i className={`fa-solid ${isMonitorVisible ? 'fa-eye-slash' : 'fa-video'} text-sm`}></i>
+            <span className="[writing-mode:vertical-lr] text-[7px] font-black uppercase tracking-widest py-1">Monitor</span>
+          </div>
+        </button>
+
+        {/* Monitor Flutuante Mobile Inteligente (Lado Oposto ao Scroll) */}
+        {isMonitorVisible && (
+          <div
+            className={`md:hidden fixed z-[45] left-0 right-0 transition-all duration-500 pointer-events-none ${miniPreviewPos === 'bottom' ? 'bottom-24 animate-slideInUp' : 'top-32 animate-slideInDown'}`}
+          >
+            <div className="relative mx-auto flex flex-col items-center">
+              <div className="bg-white/95 backdrop-blur-md p-1 rounded-xl border-2 border-blue-900/40 shadow-2xl scale-[0.32] origin-center" style={{ width: '1123px', height: '794px' }}>
+                <CertificatePreview data={data} student={previewPage === 1 ? currentStudent : null} page={previewPage} />
+              </div>
+              <div className="mt-[-250px] bg-blue-900/90 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-xl border border-white/20 backdrop-blur-sm flex items-center gap-2">
+                <i className="fa-solid fa-tower-broadcast animate-pulse text-blue-400"></i>
+                <span className="tracking-tighter uppercase">Monitor Ao Vivo</span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setIsMonitorVisible(false); }}
+                  className="pointer-events-auto ml-2 bg-white/20 hover:bg-white/40 w-4 h-4 rounded-full flex items-center justify-center"
+                >
+                  <i className="fa-solid fa-xmark text-[8px]"></i>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Botão Flutuante Mobile (MODO RETRATO) */}
         <button
@@ -864,7 +891,7 @@ const App: React.FC = () => {
           title="Ver em Modo Retrato"
         >
           <i className="fa-solid fa-mobile-screen text-xl mb-1"></i>
-          <span className="text-[8px] font-bold uppercase">Retrato</span>
+          <span className="text-[8px] font-bold uppercase text-center leading-[1] px-1">Retrato</span>
         </button>
 
         <div className="origin-top shadow-2xl transition-all duration-300 ease-out mb-24 inline-block" style={{ transform: `scale(${zoom}) ${isRotated ? 'rotate(90deg)' : ''}`, marginTop: '20px' }}>
