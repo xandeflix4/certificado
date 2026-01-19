@@ -870,12 +870,24 @@ const App: React.FC = () => {
               <div className="bg-white/95 backdrop-blur-md p-1 rounded-xl border-2 border-blue-900/40 shadow-2xl scale-[0.32] origin-center" style={{ width: '1123px', height: '794px' }}>
                 <CertificatePreview data={data} student={previewPage === 1 ? currentStudent : null} page={previewPage} />
               </div>
-              <div className="mt-[-250px] bg-blue-900/90 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-xl border border-white/20 backdrop-blur-sm flex items-center gap-2">
+              <div className="mt-[-250px] bg-blue-900/90 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-xl border border-white/20 backdrop-blur-sm flex items-center gap-1.5">
                 <i className="fa-solid fa-tower-broadcast animate-pulse text-blue-400"></i>
-                <span className="tracking-tighter uppercase">Monitor Ao Vivo</span>
+                <span className="tracking-tighter uppercase whitespace-nowrap">Monitor</span>
+
+                <div className="flex items-center bg-white/10 rounded-md p-0.5 ml-1 pointer-events-auto border border-white/10">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setPreviewPage(1); }}
+                    className={`px-1.5 py-0.5 rounded text-[8px] font-black transition-all ${previewPage === 1 ? 'bg-white text-blue-900 shadow-sm' : 'text-white hover:bg-white/10'}`}
+                  >FRENTE</button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setPreviewPage(2); }}
+                    className={`px-1.5 py-0.5 rounded text-[8px] font-black transition-all ${previewPage === 2 ? 'bg-white text-blue-900 shadow-sm' : 'text-white hover:bg-white/10'}`}
+                  >VERSO</button>
+                </div>
+
                 <button
                   onClick={(e) => { e.stopPropagation(); setIsMonitorVisible(false); }}
-                  className="pointer-events-auto ml-2 bg-white/20 hover:bg-white/40 w-4 h-4 rounded-full flex items-center justify-center"
+                  className="pointer-events-auto ml-1 bg-white/20 hover:bg-white/40 w-4 h-4 rounded-full flex items-center justify-center transition-colors"
                 >
                   <i className="fa-solid fa-xmark text-[8px]"></i>
                 </button>
