@@ -143,6 +143,7 @@ const App: React.FC = () => {
   const [showSinglePageInModal, setShowSinglePageInModal] = useState(false);
   const [modalZoom, setModalZoom] = useState(1);
   const [isAdjusting, setIsAdjusting] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   // Ajustar posição do monitor flutuante baseado no scroll e visibilidade
   useEffect(() => {
@@ -226,6 +227,7 @@ const App: React.FC = () => {
     if (window.innerWidth < 768) {
       setIsMonitorVisible(true);
       setIsAdjusting(true);
+      setActiveSection('dados');
     }
   };
 
@@ -242,6 +244,9 @@ const App: React.FC = () => {
     if (window.innerWidth < 768) {
       setIsMonitorVisible(true);
       setIsAdjusting(true);
+      // Detectar qual seção está sendo ajustada baseado no nome do campo
+      if (name.includes('FontSize')) setActiveSection('fontes');
+      else if (name.includes('Offset') || name.includes('Padding')) setActiveSection('layout');
     }
   };
 
@@ -250,6 +255,7 @@ const App: React.FC = () => {
     if (window.innerWidth < 768) {
       setIsMonitorVisible(true);
       setIsAdjusting(true);
+      setActiveSection('layout');
     }
   };
 
@@ -453,7 +459,7 @@ const App: React.FC = () => {
   const handleZoom = (delta: number) => setZoom(prev => Math.min(Math.max(prev + delta, 0.15), 1.5));
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden bg-gray-100 relative">
+    <div className="flex flex-col md:flex-row min-h-screen md:h-screen bg-gray-100 relative overflow-x-hidden md:overflow-hidden max-w-full">
       {/* Overlay de Foco para Ajustes Mobile */}
       {isAdjusting && (
         <div
@@ -557,7 +563,7 @@ const App: React.FC = () => {
             </div>
             <div className="md:hidden bg-white/20 px-2 py-1 rounded text-[10px] font-bold">MOBILE</div>
           </div>
-          <div className="flex p-2 bg-gray-100/50 gap-1.5 border-b backdrop-blur-sm">
+          <div className="flex w-full p-2 bg-gray-100/50 gap-1.5 border-b backdrop-blur-sm">
             <button
               onClick={() => setActiveTab('dados')}
               className={`flex-1 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase transition-all duration-300 flex flex-col items-center gap-1.5 border-2 ${activeTab === 'dados' ? 'bg-white text-blue-900 border-blue-900 shadow-[0_4px_12px_rgba(30,58,138,0.15)] transform scale-[1.02]' : 'bg-transparent text-gray-400 border-transparent hover:text-gray-600 hover:bg-gray-200/50'}`}
@@ -594,8 +600,11 @@ const App: React.FC = () => {
                   <i className="fa-solid fa-plus text-[10px]"></i> Adicionar Aluno
                 </button>
                 {currentStudent && (
-                  <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mt-4 animate-slideIn">
-                    <label className="block text-[10px] font-black text-blue-900/60 mb-2 uppercase tracking-widest">Ajuste de Nome (Manuscrito)</label>
+                  <div className={`bg-blue-50/50 p-4 rounded-xl border border-blue-100 mt-4 animate-slideIn transition-all duration-300 ${activeSection === 'dados' && isAdjusting ? 'relative z-[41] shadow-2xl bg-white border-blue-500 ring-4 ring-blue-500/10' : ''}`}>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="block text-[10px] font-black text-blue-900/60 uppercase tracking-widest">Ajuste de Nome (Manuscrito)</label>
+                      {activeSection === 'dados' && isAdjusting && <button onClick={() => { setIsAdjusting(false); setActiveSection(null); }} className="text-[8px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 uppercase">Ok</button>}
+                    </div>
                     <input type="text" value={currentStudent.displayName || ''} onChange={(e) => updateStudentDisplayName(currentStudent.id, e.target.value)} className="w-full px-3 py-2 text-xs border-2 border-white rounded-lg shadow-sm bg-white focus:border-blue-500 outline-none transition-all placeholder:text-gray-300" placeholder="Ex: João da Silva" />
                   </div>
                 )}
@@ -744,10 +753,10 @@ const App: React.FC = () => {
                 </div>
               </section>
 
-              <section className={`bg-gray-50 p-4 rounded-lg border border-gray-200 transition-all duration-300 ${isAdjusting ? 'relative z-[41] shadow-2xl bg-white' : ''}`}>
+              <section className={`bg-gray-50 p-4 rounded-lg border border-gray-200 transition-all duration-300 ${activeSection === 'layout' && isAdjusting ? 'relative z-[41] shadow-2xl bg-white border-blue-500' : ''}`}>
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xs font-bold text-gray-600 uppercase flex items-center gap-2"><i className="fa-solid fa-up-down-left-right"></i> Ajustes de Posição (Layout)</h3>
-                  {isAdjusting && <button onClick={() => setIsAdjusting(false)} className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200">CONCLUIR</button>}
+                  {activeSection === 'layout' && isAdjusting && <button onClick={() => { setIsAdjusting(false); setActiveSection(null); }} className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200">CONCLUIR</button>}
                 </div>
                 <div className="space-y-4">
                   <div className="bg-white p-3 rounded border border-gray-200 space-y-3">
@@ -809,10 +818,10 @@ const App: React.FC = () => {
                 </div>
               </section>
 
-              <section className={`bg-gray-50 p-4 rounded-lg border border-gray-200 transition-all duration-300 ${isAdjusting ? 'relative z-[41] shadow-2xl bg-white' : ''}`}>
+              <section className={`bg-gray-50 p-4 rounded-lg border border-gray-200 transition-all duration-300 ${activeSection === 'fontes' && isAdjusting ? 'relative z-[41] shadow-2xl bg-white border-blue-500' : ''}`}>
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xs font-bold text-gray-600 uppercase flex items-center gap-2"><i className="fa-solid fa-font"></i> Tamanhos de Fontes</h3>
-                  {isAdjusting && <button onClick={() => setIsAdjusting(false)} className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200">CONCLUIR</button>}
+                  {activeSection === 'fontes' && isAdjusting && <button onClick={() => { setIsAdjusting(false); setActiveSection(null); }} className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200">CONCLUIR</button>}
                 </div>
                 <div className="space-y-4">
                   <div className="bg-white p-3 rounded border border-gray-200 space-y-3">
@@ -922,8 +931,8 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <div className="w-full flex-grow flex flex-col items-center bg-gray-200 p-2 md:p-8 md:overflow-hidden no-print min-h-[500px] overflow-x-auto scrollbar-thin">
-        <div className="mb-6 flex flex-col items-center gap-4 no-print sticky left-0 right-0 z-30 w-full max-w-full">
+      <div className="w-full flex-grow flex flex-col items-center bg-gray-200 p-2 md:p-8 no-print min-h-[500px] overflow-x-hidden relative max-w-full">
+        <div className="mb-6 flex flex-col items-center gap-4 no-print sticky left-0 right-0 z-30 w-full max-w-[calc(100vw-16px)] mx-auto">
           <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 bg-white/90 backdrop-blur-md p-2 md:p-3 rounded-xl shadow-xl border border-white/20">
             <div className={`flex items-center gap-2 md:gap-3 bg-gray-50 px-2 md:px-3 py-1.5 rounded-lg border ${data.students.length === 0 ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
               <button disabled={currentStudentIdx === 0} onClick={() => setCurrentStudentIdx(prev => prev - 1)} className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center bg-white border rounded-full text-blue-900 hover:bg-blue-50 disabled:opacity-30"><i className="fa-solid fa-chevron-left text-xs"></i></button>
@@ -1018,8 +1027,30 @@ const App: React.FC = () => {
           <span className="text-[8px] font-bold uppercase text-center leading-[1] px-1">Retrato</span>
         </button>
 
-        <div className="origin-top shadow-2xl transition-all duration-300 ease-out mb-24 inline-block" style={{ transform: `scale(${zoom}) ${isRotated ? 'rotate(90deg)' : ''}`, marginTop: '20px' }}>
-          <CertificatePreview data={data} student={previewPage === 1 ? currentStudent : null} page={previewPage} />
+        <div className="flex flex-col items-center mb-40 w-full overflow-x-hidden max-w-full">
+          <div
+            style={{
+              width: `${(isRotated ? 794 : 1123) * zoom}px`,
+              height: `${(isRotated ? 1123 : 794) * zoom}px`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: '40px',
+              transition: 'all 0.3s ease-out'
+            }}
+          >
+            <div
+              className="shadow-2xl transition-all duration-300 ease-out flex-shrink-0"
+              style={{
+                transform: `scale(${zoom}) ${isRotated ? 'rotate(90deg)' : ''}`,
+                width: '1123px',
+                height: '794px',
+                transformOrigin: 'center center'
+              }}
+            >
+              <CertificatePreview data={data} student={previewPage === 1 ? currentStudent : null} page={previewPage} />
+            </div>
+          </div>
         </div>
 
         <div className="absolute top-[-9999px] left-0 pointer-events-none" style={{ width: '10000px', height: '2000px', overflow: 'visible' }}>
