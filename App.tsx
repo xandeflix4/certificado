@@ -130,6 +130,7 @@ const App: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [modalScale, setModalScale] = useState(0.8);
+  const [isRotated, setIsRotated] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -149,6 +150,27 @@ const App: React.FC = () => {
     { label: 'CNPJ', value: '{{CNPJ}}' },
     { label: 'Endereço', value: '{{ENDERECO}}' },
   ];
+
+  // Ajustar escala do modal baseado no tamanho da janela
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const isMobile = width < 768;
+
+      if (isMobile) {
+        // Se rotacionado, a "largura" visual do certificado A4 landscape vira 794px
+        const certWidth = isRotated ? 794 : 1123;
+        const targetScale = (width * 0.95) / certWidth;
+        setModalScale(targetScale);
+      } else {
+        setModalScale(0.8);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isPreviewOpen, isRotated]);
 
   // Função de Logout
   const handleLogout = async () => {
@@ -401,19 +423,31 @@ const App: React.FC = () => {
               <h2 className="text-xl font-bold uppercase tracking-widest text-blue-400">Pré-visualização Final</h2>
               <p className="text-xs text-gray-400">Ajustado para caber na tela</p>
             </div>
-            <div className="flex gap-4">
-              <button onClick={exportAllToPDF} className="bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow-2xl hover:bg-green-700 transition-all flex items-center gap-2 transform hover:scale-105 active:scale-95">
-                <i className="fa-solid fa-file-pdf"></i> Exportar Tudo
+            <div className="flex gap-2 md:gap-4">
+              <button
+                onClick={() => setIsRotated(!isRotated)}
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isRotated ? 'bg-blue-500 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                title="Girar Certificado"
+              >
+                <i className="fa-solid fa-rotate text-xl"></i>
               </button>
-              <button onClick={() => setIsPreviewOpen(false)} className="bg-white/10 hover:bg-white/20 text-white w-12 h-12 rounded-full flex items-center justify-center transition-all">
+              <button onClick={exportAllToPDF} className="bg-green-600 text-white px-4 md:px-8 py-3 rounded-full font-bold shadow-2xl hover:bg-green-700 transition-all flex items-center gap-2 transform hover:scale-105 active:scale-95">
+                <i className="fa-solid fa-file-pdf"></i> <span className="hidden md:inline">Exportar Tudo</span>
+              </button>
+              <button onClick={() => { setIsPreviewOpen(false); setIsRotated(false); }} className="bg-white/10 hover:bg-white/20 text-white w-12 h-12 rounded-full flex items-center justify-center transition-all">
                 <i className="fa-solid fa-xmark text-2xl"></i>
               </button>
             </div>
           </div>
-          <div className="relative w-full flex-grow flex items-center justify-center overflow-hidden">
+          <div className="relative w-full flex-grow flex items-center justify-center overflow-auto scrollbar-hide py-20 px-4">
             <div
-              className="flex flex-col xl:flex-row items-center justify-center gap-12 transition-transform duration-500"
-              style={{ transform: `scale(${modalScale})`, transformOrigin: 'center center' }}
+              className="flex flex-col xl:flex-row items-center justify-center gap-12 transition-all duration-500 ease-in-out"
+              style={{
+                transform: `scale(${modalScale}) ${isRotated ? 'rotate(90deg)' : ''}`,
+                transformOrigin: 'center center',
+                minWidth: isRotated ? '794px' : '1123px',
+                minHeight: isRotated ? '1123px' : '794px'
+              }}
             >
               <div className="flex flex-col items-center gap-4">
                 <span className="text-white/30 font-bold uppercase tracking-tighter text-sm">Página 1: Frente</span>
@@ -433,35 +467,40 @@ const App: React.FC = () => {
       )}
 
       <div className="w-full md:w-[450px] bg-white shadow-xl flex flex-col md:h-full no-print z-20 shrink-0">
-        <div className="p-6 bg-blue-900 text-white">
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            <i className="fa-solid fa-graduation-cap"></i>
-            CertificaMaster
-          </h1>
-          <p className="text-xs opacity-75">Configurador de Certificados</p>
-        </div>
-        <div className="flex p-2 bg-gray-100 gap-1 border-b shadow-sm sticky top-0 z-10">
-          <button
-            onClick={() => setActiveTab('dados')}
-            className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'dados' ? 'bg-blue-900 text-white shadow-md transform scale-105' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
-          >
-            <i className="fa-solid fa-user-graduate text-sm"></i>
-            Alunos & Curso
-          </button>
-          <button
-            onClick={() => setActiveTab('grade')}
-            className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'grade' ? 'bg-blue-900 text-white shadow-md transform scale-105' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
-          >
-            <i className="fa-solid fa-list-check text-sm"></i>
-            Grade
-          </button>
-          <button
-            onClick={() => setActiveTab('visual')}
-            className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'visual' ? 'bg-blue-900 text-white shadow-md transform scale-105' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
-          >
-            <i className="fa-solid fa-brush text-sm"></i>
-            Visual
-          </button>
+        <div className="sticky top-0 z-30 bg-white shadow-md md:relative md:shadow-none">
+          <div className="p-4 md:p-6 bg-blue-900 text-white flex justify-between items-center">
+            <div>
+              <h1 className="text-lg md:text-xl font-bold flex items-center gap-2">
+                <i className="fa-solid fa-graduation-cap"></i>
+                CertificaMaster
+              </h1>
+              <p className="text-[10px] md:text-xs opacity-75 uppercase tracking-wider">Configurador</p>
+            </div>
+            <div className="md:hidden bg-white/20 px-2 py-1 rounded text-[10px] font-bold">MOBILE</div>
+          </div>
+          <div className="flex p-1.5 md:p-2 bg-gray-50 md:bg-gray-100 gap-1 border-b">
+            <button
+              onClick={() => setActiveTab('dados')}
+              className={`flex-1 py-1.5 md:py-3 px-1 md:px-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'dados' ? 'bg-blue-900 text-white shadow-md transform scale-102 md:scale-105' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+            >
+              <i className="fa-solid fa-user-graduate text-xs md:text-sm"></i>
+              Alunos
+            </button>
+            <button
+              onClick={() => setActiveTab('grade')}
+              className={`flex-1 py-1.5 md:py-3 px-1 md:px-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'grade' ? 'bg-blue-900 text-white shadow-md transform scale-102 md:scale-105' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+            >
+              <i className="fa-solid fa-list-check text-xs md:text-sm"></i>
+              Grade
+            </button>
+            <button
+              onClick={() => setActiveTab('visual')}
+              className={`flex-1 py-1.5 md:py-3 px-1 md:px-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'visual' ? 'bg-blue-900 text-white shadow-md transform scale-102 md:scale-105' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+            >
+              <i className="fa-solid fa-brush text-xs md:text-sm"></i>
+              Visual
+            </button>
+          </div>
         </div>
         <div className="flex-1 p-6 md:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
           {activeTab === 'dados' && (
@@ -763,29 +802,46 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <div className="w-full flex-grow flex flex-col items-center justify-center bg-gray-200 p-4 md:p-8 md:overflow-hidden no-print min-h-[500px]">
-        <div className="mb-6 flex flex-col items-center gap-4 no-print sticky top-0 z-30 w-full">
-          <div className="flex flex-wrap items-center justify-center gap-4 bg-white/90 backdrop-blur-md p-3 rounded-xl shadow-xl border border-white/20">
-            <div className={`flex items-center gap-3 bg-gray-50 px-3 py-1.5 rounded-lg border ${data.students.length === 0 ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
-              <button disabled={currentStudentIdx === 0} onClick={() => setCurrentStudentIdx(prev => prev - 1)} className="w-8 h-8 flex items-center justify-center bg-white border rounded-full text-blue-900 hover:bg-blue-50 disabled:opacity-30"><i className="fa-solid fa-chevron-left"></i></button>
-              <div className="text-xs font-bold text-blue-900 min-w-[150px] text-center">
-                {data.students.length > 0 ? (<>Aluno {currentStudentIdx + 1} de {data.students.length}</>) : (<span className="text-gray-400 italic">Nenhum aluno</span>)}
+      <div className="w-full flex-grow flex flex-col items-center bg-gray-200 p-2 md:p-8 md:overflow-hidden no-print min-h-[500px] overflow-x-auto scrollbar-thin">
+        <div className="mb-6 flex flex-col items-center gap-4 no-print sticky left-0 right-0 z-30 w-full max-w-full">
+          <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 bg-white/90 backdrop-blur-md p-2 md:p-3 rounded-xl shadow-xl border border-white/20">
+            <div className={`flex items-center gap-2 md:gap-3 bg-gray-50 px-2 md:px-3 py-1.5 rounded-lg border ${data.students.length === 0 ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
+              <button disabled={currentStudentIdx === 0} onClick={() => setCurrentStudentIdx(prev => prev - 1)} className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center bg-white border rounded-full text-blue-900 hover:bg-blue-50 disabled:opacity-30"><i className="fa-solid fa-chevron-left text-xs"></i></button>
+              <div className="text-[10px] md:text-xs font-bold text-blue-900 min-w-[100px] md:min-w-[150px] text-center">
+                {data.students.length > 0 ? (<>Aluno {currentStudentIdx + 1} de {data.students.length}</>) : (<span className="text-gray-400 italic">Nenhum</span>)}
               </div>
-              <button disabled={currentStudentIdx === data.students.length - 1 || data.students.length === 0} onClick={() => setCurrentStudentIdx(prev => prev + 1)} className="w-8 h-8 flex items-center justify-center bg-white border rounded-full text-blue-900 hover:bg-blue-50 disabled:opacity-30"><i className="fa-solid fa-chevron-right"></i></button>
+              <button disabled={currentStudentIdx === data.students.length - 1 || data.students.length === 0} onClick={() => setCurrentStudentIdx(prev => prev + 1)} className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center bg-white border rounded-full text-blue-900 hover:bg-blue-50 disabled:opacity-30"><i className="fa-solid fa-chevron-right text-xs"></i></button>
             </div>
             <div className="flex items-center bg-gray-100 rounded-lg p-1 border">
-              <button onClick={() => setPreviewPage(1)} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${previewPage === 1 ? 'bg-white shadow-sm text-blue-900' : 'text-gray-500'}`}>FRENTE</button>
-              <button onClick={() => setPreviewPage(2)} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${previewPage === 2 ? 'bg-white shadow-sm text-blue-900' : 'text-gray-500'}`}>VERSO</button>
+              <button onClick={() => setPreviewPage(1)} className={`px-2 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold transition-all ${previewPage === 1 ? 'bg-white shadow-sm text-blue-900' : 'text-gray-500'}`}>FRENTE</button>
+              <button onClick={() => setPreviewPage(2)} className={`px-2 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold transition-all ${previewPage === 2 ? 'bg-white shadow-sm text-blue-900' : 'text-gray-500'}`}>VERSO</button>
             </div>
             <div className="flex items-center bg-blue-50 rounded-lg px-2 py-1 gap-2 border border-blue-100">
-              <button onClick={() => handleZoom(-0.1)} className="w-10 h-10 flex items-center justify-center bg-white border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-600 hover:text-white transition-all"><i className="fa-solid fa-magnifying-glass-minus text-lg"></i></button>
-              <div className="flex flex-col items-center min-w-[60px] px-1"><span className="text-[10px] uppercase font-bold text-blue-400">Zoom</span><span className="text-sm font-bold text-blue-900">{Math.round(zoom * 100)}%</span></div>
-              <button onClick={() => handleZoom(0.1)} className="w-10 h-10 flex items-center justify-center bg-white border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-600 hover:text-white transition-all"><i className="fa-solid fa-magnifying-glass-plus text-lg"></i></button>
+              <button
+                onClick={() => setIsRotated(!isRotated)}
+                className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center border rounded-lg transition-all ${isRotated ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-blue-200 text-blue-700 hover:bg-blue-50'}`}
+                title="Girar View"
+              >
+                <i className="fa-solid fa-rotate text-sm md:text-lg"></i>
+              </button>
+              <button onClick={() => handleZoom(-0.1)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-white border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-600 hover:text-white transition-all"><i className="fa-solid fa-magnifying-glass-minus text-sm md:text-lg"></i></button>
+              <div className="flex flex-col items-center min-w-[50px] md:min-w-[60px] px-1"><span className="text-[8px] md:text-[10px] uppercase font-bold text-blue-400">Zoom</span><span className="text-xs md:text-sm font-bold text-blue-900">{Math.round(zoom * 100)}%</span></div>
+              <button onClick={() => handleZoom(0.1)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-white border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-600 hover:text-white transition-all"><i className="fa-solid fa-magnifying-glass-plus text-sm md:text-lg"></i></button>
             </div>
           </div>
         </div>
 
-        <div className="origin-top shadow-2xl transition-transform duration-300 ease-out mb-20" style={{ transform: `scale(${zoom})`, marginTop: '20px' }}>
+        {/* Botão Flutuante Mobile */}
+        <button
+          onClick={() => { setIsPreviewOpen(true); setIsRotated(true); }}
+          className="md:hidden fixed bottom-6 right-6 z-50 w-16 h-16 bg-blue-900 text-white rounded-full shadow-2xl flex flex-col items-center justify-center animate-bounce border-2 border-white"
+          title="Ver em Modo Retrato"
+        >
+          <i className="fa-solid fa-mobile-screen text-xl mb-1"></i>
+          <span className="text-[8px] font-bold uppercase">Retrato</span>
+        </button>
+
+        <div className="origin-top shadow-2xl transition-all duration-300 ease-out mb-24 inline-block" style={{ transform: `scale(${zoom}) ${isRotated ? 'rotate(90deg)' : ''}`, marginTop: '20px' }}>
           <CertificatePreview data={data} student={previewPage === 1 ? currentStudent : null} page={previewPage} />
         </div>
 
