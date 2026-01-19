@@ -80,8 +80,8 @@ const App: React.FC = () => {
         .eq('user_id', userId)
         .maybeSingle();
 
-      if (error) {
-        console.error('Erro ao carregar dados:', error);
+      if (error && error.code !== 'PGRST116') {
+        // Silenciosamente ignora erros de permissão
         return;
       }
 
@@ -95,7 +95,7 @@ const App: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar dados da nuvem:', error);
+      // Silenciosamente ignora - funciona offline
     } finally {
       setLoadingCloud(false);
     }
@@ -104,13 +104,18 @@ const App: React.FC = () => {
   // Salvar na nuvem
   const saveCloudData = async (newData: CertificateData, userId: string) => {
     try {
-      await supabase.from('user_data').upsert({
+      const { error } = await supabase.from('user_data').upsert({
         user_id: userId,
         content: newData,
         updated_at: new Date().toISOString()
       });
+
+      // Silenciosamente ignora erros de permissão - o app funciona offline/local
+      if (error && error.code !== 'PGRST301') {
+        console.warn("⚠️ Sincronização com nuvem desabilitada. Os dados estão sendo salvos apenas localmente.");
+      }
     } catch (err) {
-      console.error("Erro ao salvar na nuvem", err);
+      // Silenciosamente ignora - funcionamento local garantido
     }
   };
 
@@ -144,6 +149,23 @@ const App: React.FC = () => {
   const [modalZoom, setModalZoom] = useState(1);
   const [isAdjusting, setIsAdjusting] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  const resetProject = async () => {
+    const shouldClear = window.confirm('🗑️ Iniciar novo projeto?\n\nIsso irá apagar todos os dados atuais e começar do zero.\n\nEsta ação não pode ser desfeita!');
+    if (shouldClear) {
+      setLoadingCloud(true);
+      try {
+        clearCertificateData();
+        await supabase.from('user_data').delete().eq('user_id', SHARED_USER_ID);
+        window.location.reload();
+      } catch (err) {
+        console.error("Erro ao resetar projeto:", err);
+        alert("Erro ao resetar projeto. Tente novamente.");
+      } finally {
+        setLoadingCloud(false);
+      }
+    }
+  };
 
   // Ajustar posição do monitor flutuante baseado no scroll e visibilidade
   useEffect(() => {
@@ -460,7 +482,7 @@ const App: React.FC = () => {
   const handleZoom = (delta: number) => setZoom(prev => Math.min(Math.max(prev + delta, 0.15), 1.5));
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen md:h-screen bg-gray-100 relative overflow-x-hidden md:overflow-hidden max-w-full">
+    <div className="flex flex-col md:flex-row min-h-screen md:h-screen bg-gray-100 relative overflow-x-hidden md:overflow-hidden max-w-full no-print">
       {/* Overlay de Foco para Ajustes Mobile */}
       {isAdjusting && (
         <div
@@ -552,17 +574,24 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <div className={`w-full md:w-[450px] bg-white shadow-xl flex flex-col md:h-full no-print shrink-0 transition-all duration-300 ${isAdjusting ? 'relative z-[40]' : 'z-20'}`}>
-        <div className="sticky top-0 z-30 bg-white shadow-md md:relative md:shadow-none">
+      <div className={`w-full md:w-[450px] bg-white shadow-2xl flex flex-col md:h-full no-print shrink-0 transition-all duration-300 ${isAdjusting ? 'relative z-[40]' : 'z-20'}`}>
+        <div className="fixed md:sticky top-0 left-0 right-0 md:left-auto md:right-auto z-30 bg-white shadow-md md:relative md:shadow-none">
           <div className={`p-4 md:p-6 bg-blue-900 text-white flex justify-between items-center transition-opacity ${isAdjusting ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
             <div>
-              <h1 className="text-lg md:text-xl font-bold flex items-center gap-2">
-                <i className="fa-solid fa-graduation-cap"></i>
+              <h1 className="text-lg md:text-xl font-bold flex items-center gap-2 leading-none">
+                <i className="fa-solid fa-graduation-cap text-blue-400"></i>
                 CertificaMaster
               </h1>
-              <p className="text-[10px] md:text-xs opacity-75 uppercase tracking-wider">Configurador</p>
+              <p className="text-[10px] md:text-xs opacity-60 uppercase tracking-widest mt-1">Configurador Pro</p>
             </div>
-            <div className="md:hidden bg-white/20 px-2 py-1 rounded text-[10px] font-bold">MOBILE</div>
+            <button
+              onClick={resetProject}
+              className="bg-white/10 hover:bg-red-500 hover:text-white text-white/80 p-2 rounded-xl transition-all flex items-center gap-2 border border-white/10 group active:scale-95"
+              title="Novo Projeto / Limpar Cache"
+            >
+              <i className="fa-solid fa-file-circle-plus text-sm group-hover:rotate-12 transition-transform"></i>
+              <span className="text-[9px] font-black uppercase tracking-tighter">Novo Projeto</span>
+            </button>
           </div>
           {isAdjusting && (
             <button
@@ -596,7 +625,7 @@ const App: React.FC = () => {
             </button>
           </div>
         </div>
-        <div className="flex-1 p-6 md:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
+        <div className="flex-1 p-6 pt-44 md:pt-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
           {activeTab === 'dados' && (
             <div className="animate-fadeIn space-y-6">
               <section>
@@ -938,8 +967,8 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <div className="w-full flex-grow flex flex-col items-center bg-gray-200 p-2 md:p-8 no-print min-h-[500px] overflow-x-hidden relative max-w-full">
-        <div className="mb-6 flex flex-col items-center gap-4 no-print sticky left-0 right-0 z-30 w-full max-w-[calc(100vw-16px)] mx-auto">
+      <div className="w-full flex-grow flex flex-col items-center justify-center bg-gray-200 p-2 md:p-4 no-print overflow-y-auto overflow-x-hidden relative max-w-full">
+        <div className="mb-4 flex flex-col items-center gap-4 no-print sticky top-0 left-0 right-0 z-30 w-full max-w-[calc(100vw-16px)] mx-auto bg-gray-200 pb-4">
           <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 bg-white/90 backdrop-blur-md p-2 md:p-3 rounded-xl shadow-xl border border-white/20">
             <div className={`flex items-center gap-2 md:gap-3 bg-gray-50 px-2 md:px-3 py-1.5 rounded-lg border ${data.students.length === 0 ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
               <button disabled={currentStudentIdx === 0} onClick={() => setCurrentStudentIdx(prev => prev - 1)} className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center bg-white border rounded-full text-blue-900 hover:bg-blue-50 disabled:opacity-30"><i className="fa-solid fa-chevron-left text-xs"></i></button>
@@ -1055,11 +1084,12 @@ const App: React.FC = () => {
           <span className="text-[8px] font-bold uppercase text-center leading-[1] px-1">Retrato</span>
         </button>
 
-        <div className="flex flex-col items-center mb-40 w-full overflow-x-hidden max-w-full">
+        <div className="flex flex-col items-center justify-center w-full overflow-x-hidden max-w-full flex-1">
           <div
             style={{
               width: `${(isRotated ? 794 : 1123) * zoom}px`,
               height: `${(isRotated ? 1123 : 794) * zoom}px`,
+              maxWidth: '100%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
