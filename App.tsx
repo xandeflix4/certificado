@@ -91,7 +91,12 @@ const App: React.FC = () => {
         .from('user_data')
         .select('content')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
+
+      if (error) {
+        console.error('Erro ao carregar dados:', error);
+        return;
+      }
 
       if (userData && userData.content) {
         // Mesclar dados da nuvem mantendo funções locais se necessário
@@ -138,12 +143,6 @@ const App: React.FC = () => {
       saveCertificateData(data);
     }
   }, [data, session]);
-
-  // Se não estiver logado, mostra tela de Login
-  if (!session) {
-    return <Auth />;
-  }
-
 
   const [activeTab, setActiveTab] = useState<'dados' | 'visual' | 'grade'>('dados');
   const [previewPage, setPreviewPage] = useState<1 | 2>(1);
@@ -413,6 +412,11 @@ const App: React.FC = () => {
 
   const currentStudent = data.students[currentStudentIdx] || null;
   const handleZoom = (delta: number) => setZoom(prev => Math.min(Math.max(prev + delta, 0.15), 1.5));
+
+  // Se não estiver logado, mostra tela de Login
+  if (!session) {
+    return <Auth />;
+  }
 
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
