@@ -12,19 +12,19 @@ interface CurriculumTableProps {
   onUpdateTotal: (value: string) => void;
 }
 
-const CurriculumTable: React.FC<CurriculumTableProps> = ({ 
-  items, 
-  totalHours, 
-  showHoursColumn, 
-  onAdd, 
-  onRemove, 
+const CurriculumTable: React.FC<CurriculumTableProps> = ({
+  items,
+  totalHours,
+  showHoursColumn,
+  onAdd,
+  onRemove,
   onUpdate,
-  onUpdateTotal 
+  onUpdateTotal
 }) => {
   const [subject, setSubject] = useState('');
   const [hours, setHours] = useState('');
   const [bulkText, setBulkText] = useState('');
-  
+
   // Estados para edição inline
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingSubject, setEditingSubject] = useState('');
@@ -44,13 +44,13 @@ const CurriculumTable: React.FC<CurriculumTableProps> = ({
 
   const handleBulkAdd = () => {
     if (!bulkText.trim()) return;
-    
+
     const lines = bulkText.split('\n').filter(line => line.trim() !== '');
     lines.forEach(line => {
       const parts = line.split(/[;|,]/);
       const sub = parts[0]?.trim();
       const hr = parts[1]?.trim();
-      
+
       if (sub) {
         onAdd({
           id: Math.random().toString(36).substring(2, 9),
@@ -96,7 +96,7 @@ const CurriculumTable: React.FC<CurriculumTableProps> = ({
             placeholder="Nome da Disciplina (Obrigatório)"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+            className="flex-1 px-4 py-2.5 text-sm border-2 border-white rounded-xl bg-white shadow-sm focus:border-blue-500 outline-none transition-all placeholder:text-gray-300"
           />
           {showHoursColumn && (
             <input
@@ -104,30 +104,30 @@ const CurriculumTable: React.FC<CurriculumTableProps> = ({
               placeholder="Horas"
               value={hours}
               onChange={(e) => setHours(e.target.value)}
-              className="w-24 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-24 px-4 py-2.5 text-sm border-2 border-white rounded-xl bg-white shadow-sm focus:border-blue-500 outline-none transition-all text-center placeholder:text-gray-300"
             />
           )}
           <button
             onClick={handleAddSingle}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-blue-700 transition-colors"
+            className="bg-blue-900 text-white px-6 py-2.5 rounded-xl text-xs font-black hover:bg-blue-800 transition-all shadow-md active:scale-95 flex items-center gap-2"
           >
-            Add
+            <i className="fa-solid fa-plus text-[10px]"></i> <span className="hidden sm:inline">ADICIONAR</span>
           </button>
         </div>
 
-        <div className="border-t border-blue-100 pt-3">
-          <label className="block text-xs font-bold text-blue-800 mb-1 uppercase">Importação em Lote (Uma por linha)</label>
+        <div className="border-t border-blue-900/10 pt-4 mt-2">
+          <label className="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-widest">Importação em Lote (Smart CSV)</label>
           <textarea
             placeholder={`Ex: Introdução ao Design${showHoursColumn ? ', 10' : ''}\nTeoria das Cores${showHoursColumn ? ', 20' : ''}`}
             value={bulkText}
             onChange={(e) => setBulkText(e.target.value)}
-            className="w-full h-24 text-xs p-2 border border-gray-300 rounded-md bg-white font-mono focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full h-24 text-xs p-3 border-2 border-white rounded-xl bg-white/50 font-mono focus:bg-white focus:border-blue-200 outline-none transition-all"
           />
           <button
             onClick={handleBulkAdd}
-            className="mt-2 text-xs font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1"
+            className="mt-2 w-full py-2.5 text-xs font-black text-blue-900 hover:bg-blue-900 hover:text-white rounded-xl border-2 border-blue-900/10 transition-all uppercase tracking-widest flex items-center justify-center gap-2 group"
           >
-            <i className="fa-solid fa-file-import"></i> Processar Lista de Disciplinas
+            <i className="fa-solid fa-layer-group text-[10px] transition-transform group-hover:scale-110"></i> Processar Grade Curricular em Bloco
           </button>
         </div>
       </div>
@@ -182,14 +182,14 @@ const CurriculumTable: React.FC<CurriculumTableProps> = ({
                     <div className="flex items-center justify-center gap-2">
                       {editingId === item.id ? (
                         <>
-                          <button 
+                          <button
                             onClick={saveEditing}
                             className="text-green-600 hover:text-green-800 transition-colors"
                             title="Salvar"
                           >
                             <i className="fa-solid fa-check"></i>
                           </button>
-                          <button 
+                          <button
                             onClick={cancelEditing}
                             className="text-gray-400 hover:text-gray-600 transition-colors"
                             title="Cancelar"
@@ -199,16 +199,16 @@ const CurriculumTable: React.FC<CurriculumTableProps> = ({
                         </>
                       ) : (
                         <>
-                          <button 
+                          <button
                             onClick={() => startEditing(item)}
                             className="text-blue-500 hover:text-blue-700 transition-colors"
                             title="Editar disciplina"
                           >
                             <i className="fa-solid fa-pen-to-square"></i>
                           </button>
-                          <button 
+                          <button
                             onClick={() => onRemove(item.id)}
-                            className="text-red-500 hover:text-red-700 transition-colors"
+                            className="text-red-500 hover:text-red-700 transition-colors text-xs"
                             title="Remover disciplina"
                           >
                             <i className="fa-solid fa-trash-can"></i>
@@ -227,9 +227,9 @@ const CurriculumTable: React.FC<CurriculumTableProps> = ({
               {showHoursColumn ? (
                 <td className="px-2 py-1 text-center">
                   <div className="flex items-center justify-center gap-1 group">
-                    <input 
-                      type="text" 
-                      value={totalHours} 
+                    <input
+                      type="text"
+                      value={totalHours}
                       onChange={(e) => onUpdateTotal(e.target.value)}
                       className="w-16 px-1 py-1 border border-transparent hover:border-blue-200 focus:border-blue-500 bg-transparent text-center text-blue-900 focus:bg-white rounded outline-none transition-all"
                       title="Clique para editar o total manualmente"
@@ -240,10 +240,10 @@ const CurriculumTable: React.FC<CurriculumTableProps> = ({
                 </td>
               ) : (
                 <td className="px-2 py-1 text-center" colSpan={1}>
-                   <div className="flex items-center justify-center gap-1 group">
-                    <input 
-                      type="text" 
-                      value={totalHours} 
+                  <div className="flex items-center justify-center gap-1 group">
+                    <input
+                      type="text"
+                      value={totalHours}
                       onChange={(e) => onUpdateTotal(e.target.value)}
                       className="w-16 px-1 py-1 border border-transparent hover:border-blue-200 focus:border-blue-500 bg-transparent text-center text-blue-900 focus:bg-white rounded outline-none transition-all"
                       title="Clique para editar o total manualmente"

@@ -478,10 +478,10 @@ const App: React.FC = () => {
               >
                 <i className="fa-solid fa-rotate text-xl"></i>
               </button>
-              <button onClick={exportAllToPDF} className="bg-green-600 text-white px-6 py-3 rounded-full font-bold shadow-xl hover:bg-green-700 transition-all flex items-center gap-2 transform hover:scale-105 active:scale-95">
-                <i className="fa-solid fa-file-pdf"></i> <span className="hidden sm:inline">Exportar</span>
+              <button onClick={exportAllToPDF} className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-3 rounded-full font-black shadow-[0_10px_20px_-5px_rgba(22,163,74,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(22,163,74,0.6)] transition-all flex items-center gap-2 transform hover:scale-105 active:scale-95">
+                <i className="fa-solid fa-file-pdf"></i> <span className="hidden sm:inline uppercase tracking-widest text-xs">Baixar Tudo</span>
               </button>
-              <button onClick={() => { setIsPreviewOpen(false); setIsRotated(false); setShowSinglePageInModal(false); setModalZoom(1); }} className="bg-red-500/20 hover:bg-red-500 text-white w-12 h-12 rounded-full flex items-center justify-center transition-all border border-red-500/30">
+              <button onClick={() => { setIsPreviewOpen(false); setIsRotated(false); setShowSinglePageInModal(false); setModalZoom(1); }} className="bg-white/10 hover:bg-red-500 text-white w-12 h-12 rounded-full flex items-center justify-center transition-all border border-white/10 hover:border-red-500 active:scale-95">
                 <i className="fa-solid fa-xmark text-2xl"></i>
               </button>
             </div>
@@ -533,26 +533,26 @@ const App: React.FC = () => {
             </div>
             <div className="md:hidden bg-white/20 px-2 py-1 rounded text-[10px] font-bold">MOBILE</div>
           </div>
-          <div className="flex p-1.5 md:p-2 bg-gray-50 md:bg-gray-100 gap-1 border-b">
+          <div className="flex p-2 bg-gray-100/50 gap-1.5 border-b backdrop-blur-sm">
             <button
               onClick={() => setActiveTab('dados')}
-              className={`flex-1 py-1.5 md:py-3 px-1 md:px-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'dados' ? 'bg-blue-900 text-white shadow-md transform scale-102 md:scale-105' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+              className={`flex-1 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase transition-all duration-300 flex flex-col items-center gap-1.5 border-2 ${activeTab === 'dados' ? 'bg-white text-blue-900 border-blue-900 shadow-[0_4px_12px_rgba(30,58,138,0.15)] transform scale-[1.02]' : 'bg-transparent text-gray-400 border-transparent hover:text-gray-600 hover:bg-gray-200/50'}`}
             >
-              <i className="fa-solid fa-user-graduate text-xs md:text-sm"></i>
+              <i className={`fa-solid fa-user-graduate ${activeTab === 'dados' ? 'text-blue-600' : ''}`}></i>
               Alunos
             </button>
             <button
               onClick={() => setActiveTab('grade')}
-              className={`flex-1 py-1.5 md:py-3 px-1 md:px-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'grade' ? 'bg-blue-900 text-white shadow-md transform scale-102 md:scale-105' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+              className={`flex-1 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase transition-all duration-300 flex flex-col items-center gap-1.5 border-2 ${activeTab === 'grade' ? 'bg-white text-blue-900 border-blue-900 shadow-[0_4px_12px_rgba(30,58,138,0.15)] transform scale-[1.02]' : 'bg-transparent text-gray-400 border-transparent hover:text-gray-600 hover:bg-gray-200/50'}`}
             >
-              <i className="fa-solid fa-list-check text-xs md:text-sm"></i>
+              <i className={`fa-solid fa-list-check ${activeTab === 'grade' ? 'text-blue-600' : ''}`}></i>
               Grade
             </button>
             <button
               onClick={() => setActiveTab('visual')}
-              className={`flex-1 py-1.5 md:py-3 px-1 md:px-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition-all duration-200 flex flex-col items-center gap-1 ${activeTab === 'visual' ? 'bg-blue-900 text-white shadow-md transform scale-102 md:scale-105' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+              className={`flex-1 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase transition-all duration-300 flex flex-col items-center gap-1.5 border-2 ${activeTab === 'visual' ? 'bg-white text-blue-900 border-blue-900 shadow-[0_4px_12px_rgba(30,58,138,0.15)] transform scale-[1.02]' : 'bg-transparent text-gray-400 border-transparent hover:text-gray-600 hover:bg-gray-200/50'}`}
             >
-              <i className="fa-solid fa-brush text-xs md:text-sm"></i>
+              <i className={`fa-solid fa-brush ${activeTab === 'visual' ? 'text-blue-600' : ''}`}></i>
               Visual
             </button>
           </div>
@@ -566,17 +566,21 @@ const App: React.FC = () => {
                   <input type="text" placeholder="Nome Completo" value={newStudentName} onChange={(e) => setNewStudentName(e.target.value)} className="px-3 py-2 text-sm border rounded bg-white focus:ring-2 focus:ring-blue-500 outline-none" />
                   <input type="text" placeholder="CPF" value={newStudentCpf} onChange={(e) => setNewStudentCpf(e.target.value)} className="px-3 py-2 text-sm border rounded bg-white focus:ring-2 focus:ring-blue-500 outline-none" />
                 </div>
-                <button onClick={addStudent} className="w-full bg-blue-600 text-white py-2 rounded text-sm font-bold hover:bg-blue-700 transition-colors">Adicionar Aluno</button>
+                <button onClick={addStudent} className="w-full bg-blue-900 text-white py-2.5 rounded-xl text-xs font-black hover:bg-blue-800 transition-all shadow-[0_4px_12px_rgba(30,58,138,0.2)] active:scale-[0.98] uppercase tracking-wider flex items-center justify-center gap-2">
+                  <i className="fa-solid fa-plus text-[10px]"></i> Adicionar Aluno
+                </button>
                 {currentStudent && (
-                  <div className="bg-blue-50 p-3 rounded border border-blue-100 mb-4">
-                    <label className="block text-[10px] font-bold text-blue-800 mb-1 uppercase">Nome de Destaque (Manuscrito)</label>
-                    <input type="text" value={currentStudent.displayName || ''} onChange={(e) => updateStudentDisplayName(currentStudent.id, e.target.value)} className="w-full px-2 py-1.5 text-xs border rounded bg-white focus:ring-2 focus:ring-blue-500 outline-none" />
+                  <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mt-4 animate-slideIn">
+                    <label className="block text-[10px] font-black text-blue-900/60 mb-2 uppercase tracking-widest">Ajuste de Nome (Manuscrito)</label>
+                    <input type="text" value={currentStudent.displayName || ''} onChange={(e) => updateStudentDisplayName(currentStudent.id, e.target.value)} className="w-full px-3 py-2 text-xs border-2 border-white rounded-lg shadow-sm bg-white focus:border-blue-500 outline-none transition-all placeholder:text-gray-300" placeholder="Ex: João da Silva" />
                   </div>
                 )}
-                <div className="bg-gray-50 p-3 rounded border border-dashed mb-4">
-                  <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Importação Massiva (Nome, CPF)</label>
-                  <textarea placeholder="João Silva, 123.456.789-00&#10;Maria Souza, 987.654.321-11" className="w-full h-24 text-xs p-2 border rounded font-mono bg-white focus:ring-2 focus:ring-blue-500 outline-none" value={bulkInput} onChange={(e) => setBulkInput(e.target.value)} />
-                  <button onClick={handleBulkImport} className="mt-2 text-xs font-bold text-blue-600 hover:underline">Processar Lista</button>
+                <div className="bg-gray-50 p-4 rounded-xl border-2 border-dashed border-gray-200 mt-4">
+                  <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase tracking-widest">Importação Massiva (CSV)</label>
+                  <textarea placeholder="João Silva, 123.456.789-00&#10;Maria Souza, 987.654.321-11" className="w-full h-24 text-xs p-3 border-none rounded-lg font-mono bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all" value={bulkInput} onChange={(e) => setBulkInput(e.target.value)} />
+                  <button onClick={handleBulkImport} className="mt-2 w-full text-center py-2 text-xs font-black text-blue-600 hover:bg-blue-50 rounded-lg transition-all uppercase tracking-widest">
+                    <i className="fa-solid fa-file-import mr-1"></i> Processar Lista de Importação
+                  </button>
                 </div>
                 <div className="max-h-40 overflow-y-auto border rounded divide-y bg-white">
                   {data.students.length === 0 ? (<p className="p-4 text-center text-xs text-gray-400 italic">Nenhum aluno cadastrado.</p>) : (
@@ -596,7 +600,9 @@ const App: React.FC = () => {
                   <input type="text" placeholder="Nome do Instrutor" value={newInstructorName} onChange={(e) => setNewInstructorName(e.target.value)} className="w-full px-3 py-2 text-sm border rounded bg-white focus:ring-2 focus:ring-blue-500 outline-none" />
                   <input type="text" placeholder="Especialidades / Competências" value={newInstructorCompetencies} onChange={(e) => setNewInstructorCompetencies(e.target.value)} className="w-full px-3 py-2 text-sm border rounded bg-white focus:ring-2 focus:ring-blue-500 outline-none" />
                 </div>
-                <button onClick={addInstructor} className="w-full bg-blue-600 text-white py-2 rounded text-sm font-bold hover:bg-blue-700 transition-colors mb-4">Adicionar Instrutor</button>
+                <button onClick={addInstructor} className="w-full bg-blue-900 text-white py-2.5 rounded-xl text-xs font-black hover:bg-blue-800 transition-all shadow-[0_4px_12px_rgba(30,58,138,0.2)] active:scale-[0.98] uppercase tracking-wider flex items-center justify-center gap-2">
+                  <i className="fa-solid fa-plus text-[10px]"></i> Adicionar Instrutor
+                </button>
 
                 <div className="max-h-32 overflow-y-auto border rounded divide-y bg-white">
                   {data.instructors.length === 0 ? (<p className="p-3 text-center text-xs text-gray-400 italic">Nenhum instrutor adicionado.</p>) : (
@@ -740,11 +746,11 @@ const App: React.FC = () => {
                     </div>
                     <div className="pt-2">
                       <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Alinhamento do Texto</label>
-                      <div className="flex bg-gray-100 p-1 rounded-md border">
-                        <button onClick={() => setTextAlign('left')} className={`flex-1 py-1.5 rounded transition-all ${data.frontTextAlign === 'left' ? 'bg-white shadow text-blue-600' : 'text-gray-400 hover:text-gray-600'}`} title="Esquerda"><i className="fa-solid fa-align-left"></i></button>
-                        <button onClick={() => setTextAlign('center')} className={`flex-1 py-1.5 rounded transition-all ${data.frontTextAlign === 'center' ? 'bg-white shadow text-blue-600' : 'text-gray-400 hover:text-gray-600'}`} title="Centralizado"><i className="fa-solid fa-align-center"></i></button>
-                        <button onClick={() => setTextAlign('right')} className={`flex-1 py-1.5 rounded transition-all ${data.frontTextAlign === 'right' ? 'bg-white shadow text-blue-600' : 'text-gray-400 hover:text-gray-600'}`} title="Direita"><i className="fa-solid fa-align-right"></i></button>
-                        <button onClick={() => setTextAlign('justify')} className={`flex-1 py-1.5 rounded transition-all ${data.frontTextAlign === 'justify' ? 'bg-white shadow text-blue-600' : 'text-gray-400 hover:text-gray-600'}`} title="Justificado"><i className="fa-solid fa-align-justify"></i></button>
+                      <div className="flex bg-gray-100 p-1.5 rounded-xl gap-1">
+                        <button onClick={() => setTextAlign('left')} className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center ${data.frontTextAlign === 'left' ? 'bg-white shadow-md text-blue-600' : 'text-gray-400 hover:bg-white/50'}`} title="Esquerda"><i className="fa-solid fa-align-left text-sm"></i></button>
+                        <button onClick={() => setTextAlign('center')} className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center ${data.frontTextAlign === 'center' ? 'bg-white shadow-md text-blue-600' : 'text-gray-400 hover:bg-white/50'}`} title="Centralizado"><i className="fa-solid fa-align-center text-sm"></i></button>
+                        <button onClick={() => setTextAlign('right')} className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center ${data.frontTextAlign === 'right' ? 'bg-white shadow-md text-blue-600' : 'text-gray-400 hover:bg-white/50'}`} title="Direita"><i className="fa-solid fa-align-right text-sm"></i></button>
+                        <button onClick={() => setTextAlign('justify')} className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center ${data.frontTextAlign === 'justify' ? 'bg-white shadow-md text-blue-600' : 'text-gray-400 hover:bg-white/50'}`} title="Justificado"><i className="fa-solid fa-align-justify text-sm"></i></button>
                       </div>
                     </div>
                   </div>
@@ -758,21 +764,20 @@ const App: React.FC = () => {
                 </h3>
                 <div className="bg-white p-3 rounded border border-gray-200">
                   <p className="text-[10px] font-bold text-gray-500 uppercase mb-3">Negrito nas Variáveis Dinâmicas</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {availableVariables.map((variable) => (
-                      <div key={variable.value} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id={`bold-${variable.value}`}
-                          checked={data.boldVariables.includes(variable.value)}
-                          onChange={() => toggleBoldVariable(variable.value)}
-                          className="w-4 h-4 text-blue-600 rounded cursor-pointer"
-                        />
-                        <label htmlFor={`bold-${variable.value}`} className="text-xs text-gray-700 cursor-pointer select-none">
-                          {variable.label}
-                        </label>
-                      </div>
-                    ))}
+                  <div className="flex flex-wrap gap-2">
+                    {availableVariables.map((variable) => {
+                      const isActive = data.boldVariables.includes(variable.value);
+                      return (
+                        <button
+                          key={variable.value}
+                          onClick={() => toggleBoldVariable(variable.value)}
+                          className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter transition-all border-2 ${isActive ? 'bg-blue-900 text-white border-blue-900 shadow-md transform scale-105' : 'bg-white text-gray-400 border-gray-100 hover:border-blue-200 hover:text-blue-900'}`}
+                        >
+                          {isActive && <i className="fa-solid fa-check mr-1 text-[8px]"></i>}
+                          {variable.label.replace('Nome do ', '')}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </section>
@@ -811,18 +816,31 @@ const App: React.FC = () => {
 
               <section className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm space-y-4">
                 <h3 className="text-xs font-bold text-gray-600 uppercase flex items-center gap-2"><i className="fa-solid fa-image"></i> Ativos Visuais</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Fundo (Pág 1)</label>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'bgImage')} className="block w-full text-[11px] text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="bg-gray-50 p-3 rounded-xl border-2 border-dashed border-gray-200">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Imagem de Fundo (Página 1)</label>
+                    <div className="relative group">
+                      <input type="file" accept="image/*" id="bg-upload" onChange={(e) => handleFileUpload(e, 'bgImage')} className="hidden" />
+                      <label htmlFor="bg-upload" className="flex items-center justify-center gap-2 w-full py-3 bg-white border-2 border-blue-900/10 rounded-xl text-blue-900 font-black text-[10px] uppercase tracking-widest cursor-pointer hover:bg-blue-900 hover:text-white transition-all shadow-sm">
+                        <i className="fa-solid fa-cloud-arrow-up text-sm"></i> {data.bgImage ? 'Alterar Fundo' : 'Fazer Upload do Fundo'}
+                      </label>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Assinatura Digital Principal</label>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'signatureImage')} className="block w-full text-[11px] text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Selo / Assinatura Técnica</label>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'digitalSeal')} className="block w-full text-[11px] text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-gray-50 p-3 rounded-xl border-2 border-dashed border-gray-200">
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Assinatura</label>
+                      <input type="file" accept="image/*" id="sig-upload" onChange={(e) => handleFileUpload(e, 'signatureImage')} className="hidden" />
+                      <label htmlFor="sig-upload" className="flex flex-col items-center justify-center gap-1 w-full py-4 bg-white border-2 border-blue-900/10 rounded-xl text-blue-900 font-black text-[9px] uppercase tracking-widest cursor-pointer hover:bg-blue-900 hover:text-white transition-all shadow-sm">
+                        <i className="fa-solid fa-pen-nib text-sm"></i> {data.signatureImage ? 'Trocar' : 'Upload'}
+                      </label>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-xl border-2 border-dashed border-gray-200">
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Selo Digital</label>
+                      <input type="file" accept="image/*" id="seal-upload" onChange={(e) => handleFileUpload(e, 'digitalSeal')} className="hidden" />
+                      <label htmlFor="seal-upload" className="flex flex-col items-center justify-center gap-1 w-full py-4 bg-white border-2 border-blue-900/10 rounded-xl text-blue-900 font-black text-[9px] uppercase tracking-widest cursor-pointer hover:bg-blue-900 hover:text-white transition-all shadow-sm">
+                        <i className="fa-solid fa-stamp text-sm"></i> {data.digitalSeal ? 'Trocar' : 'Upload'}
+                      </label>
+                    </div>
                   </div>
                 </div>
               </section>
@@ -835,7 +853,7 @@ const App: React.FC = () => {
             </div>
           )}
         </div>
-        <div className="p-6 border-t bg-gray-50 flex flex-col gap-3 shrink-0 z-20">
+        <div className="p-4 md:p-6 border-t bg-white flex flex-col gap-3 shrink-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
           <button
             onClick={() => {
               const shouldClear = window.confirm('🗑️ Limpar todos os dados?\n\nIsso irá remover:\n• Todos os alunos\n• Configurações visuais\n• Grade curricular\n• Dados salvos\n\nEsta ação não pode ser desfeita!');
@@ -844,15 +862,32 @@ const App: React.FC = () => {
                 window.location.reload();
               }
             }}
-            className="w-full bg-red-50 border border-red-300 text-red-600 font-bold py-2 rounded-lg hover:bg-red-100 transition-all flex items-center justify-center gap-2 text-sm"
+            className="w-full group py-2 rounded-xl text-red-500 text-xs font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2 border border-transparent hover:border-red-100 active:scale-95"
           >
-            <i className="fa-solid fa-trash-can"></i> LIMPAR TUDO
+            <i className="fa-solid fa-trash-can opacity-60 group-hover:opacity-100 transition-opacity"></i>
+            <span className="tracking-tight">LIMPAR TUDO</span>
           </button>
-          <button onClick={() => setIsPreviewOpen(true)} disabled={data.students.length === 0} className="w-full bg-white border-2 border-blue-900 text-blue-900 font-bold py-2 rounded-lg hover:bg-blue-50 transition-all flex items-center justify-center gap-2">
-            <i className="fa-solid fa-eye"></i> PRÉ-VISUALIZAR TUDO
+
+          <button
+            onClick={() => setIsPreviewOpen(true)}
+            disabled={data.students.length === 0}
+            className="w-full bg-blue-50/50 hover:bg-blue-600 hover:text-white text-blue-900 border-2 border-blue-900/10 hover:border-blue-600 font-black py-3 rounded-xl transition-all flex items-center justify-center gap-3 active:scale-95 shadow-sm disabled:opacity-30 disabled:pointer-events-none"
+          >
+            <i className="fa-solid fa-eye text-base"></i>
+            <span className="uppercase tracking-tighter text-xs">Pré-visualizar Tudo</span>
           </button>
-          <button onClick={exportAllToPDF} disabled={isGenerating || data.students.length === 0} className="w-full bg-green-600 text-white font-bold py-3 rounded-lg shadow-md hover:bg-green-700 disabled:bg-gray-400 transition-all flex items-center justify-center gap-2">
-            {isGenerating ? (<><i className="fa-solid fa-circle-notch animate-spin"></i> GERANDO...</>) : (<><i className="fa-solid fa-file-pdf"></i> EXPORTAR LOTE</>)}
+
+          <button
+            onClick={exportAllToPDF}
+            disabled={isGenerating || data.students.length === 0}
+            className="w-full relative overflow-hidden bg-gradient-to-br from-green-500 to-green-700 text-white font-black py-4 rounded-xl shadow-[0_10px_25px_-5px_rgba(22,163,74,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(22,163,74,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 disabled:from-gray-400 disabled:to-gray-500 disabled:shadow-none disabled:translate-y-0 transition-all flex items-center justify-center gap-3"
+          >
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity"></div>
+            {isGenerating ? (
+              <><i className="fa-solid fa-circle-notch animate-spin text-lg"></i> <span className="uppercase tracking-widest text-xs">Gerando Arquivos...</span></>
+            ) : (
+              <><i className="fa-solid fa-file-pdf text-lg"></i> <span className="uppercase tracking-widest text-xs">Exportar Lote</span></>
+            )}
           </button>
         </div>
       </div>
