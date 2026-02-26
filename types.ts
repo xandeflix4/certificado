@@ -3,8 +3,8 @@ export interface Student {
   id: string;
   name: string;
   cpf: string;
-  displayName?: string; // Nome que aparece em destaque (manuscrito)
 }
+
 
 export interface Instructor {
   id: string;
@@ -48,13 +48,11 @@ export interface CertificateData {
   versoCurriculumVerticalOffset: number;
   mainTextVerticalOffset: number;
   titleVerticalOffset: number;
-  titleFontSize: number;
-  subtitleFontSize: number;
-  titleSpacing: number;
+  titleFontSize: number,
+
   bodyVerticalOffset: number;
-  highlightNameVerticalOffset: number;
-  highlightNameFontSize: number;
   frontSidePadding: number;
+
   signaturesVerticalOffset: number;
   signaturesHorizontalPadding: number;
   signatureFontSize: number;

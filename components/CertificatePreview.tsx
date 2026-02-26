@@ -14,8 +14,6 @@ const CertificatePreview: React.FC<CertificatePreviewProps> = ({ data, student, 
   // Versão 1: Frente
   if (page === 1) {
     const formattedText = replaceVariables(data.baseText, data, student);
-    const displayHighlightName = student?.displayName || student?.name || '[Nome de Destaque]';
-
     return (
       <div
         id={`certificate-page-1${idSuffix}`}
@@ -70,34 +68,12 @@ const CertificatePreview: React.FC<CertificatePreviewProps> = ({ data, student, 
             >
               Certificado
             </h1>
-            <p
-              style={{ fontSize: `${data.subtitleFontSize}px`, marginTop: `${data.titleSpacing}px` }}
-              className="font-medium text-gray-500 tracking-[0.4em] uppercase"
-            >
-              DE PARTICIPAÇÃO
-            </p>
           </div>
 
-          {/* ZONA 2: NOME MANUSCRITO */}
-          <div
-            className="w-full flex items-center justify-center"
-            style={{ height: '140px', marginTop: '20px', transform: `translateY(${data.highlightNameVerticalOffset}px)` }}
-          >
-            <div
-              className="script-font text-blue-900 text-center w-full leading-none"
-              style={{ fontSize: `${data.highlightNameFontSize}px` }}
-            >
-              {displayHighlightName}
-            </div>
-          </div>
-
-          <div
-            className="w-full border-b border-gray-300"
-            style={{ marginBottom: '30px', transform: `translateY(${data.highlightNameVerticalOffset}px)` }}
-          ></div>
 
           <div
             className="text-2xl leading-relaxed text-gray-800 whitespace-pre-wrap w-full px-6 flex-grow flex items-center"
+
             style={{
               transform: `translateY(${data.bodyVerticalOffset}px)`,
               textAlign: data.frontTextAlign,

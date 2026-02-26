@@ -43,12 +43,11 @@ const App: React.FC = () => {
     mainTextVerticalOffset: 0,
     titleVerticalOffset: 0,
     titleFontSize: 100,
-    subtitleFontSize: 24,
-    titleSpacing: 24,
+
     bodyVerticalOffset: 0,
-    highlightNameVerticalOffset: 0,
-    highlightNameFontSize: 80,
     frontSidePadding: 128,
+
+
     signaturesVerticalOffset: 0,
     signaturesHorizontalPadding: 40,
     signatureFontSize: 14,
@@ -322,9 +321,9 @@ const App: React.FC = () => {
     const newStudent: Student = {
       id: Math.random().toString(36).substring(2, 9),
       name: newStudentName,
-      cpf: newStudentCpf,
-      displayName: newStudentName
+      cpf: newStudentCpf
     };
+
     setData(prev => ({ ...prev, students: [...prev.students, newStudent] }));
     setNewStudentName('');
     setNewStudentCpf('');
@@ -353,12 +352,6 @@ const App: React.FC = () => {
     }
   };
 
-  const updateStudentDisplayName = (id: string, value: string) => {
-    setData(prev => ({
-      ...prev,
-      students: prev.students.map(s => s.id === id ? { ...s, displayName: value } : s)
-    }));
-  };
 
   const removeStudent = (id: string) => {
     const student = data.students.find(s => s.id === id);
@@ -381,9 +374,9 @@ const App: React.FC = () => {
       return {
         id: Math.random().toString(36).substring(2, 9),
         name: name,
-        cpf: parts[1]?.trim() || '000.000.000-00',
-        displayName: name
+        cpf: parts[1]?.trim() || '000.000.000-00'
       };
+
     });
     setData(prev => ({ ...prev, students: [...prev.students, ...newStudents] }));
     setBulkInput('');
@@ -637,15 +630,6 @@ const App: React.FC = () => {
                 <button onClick={addStudent} className="w-full bg-blue-900 text-white py-2.5 rounded-xl text-xs font-black hover:bg-blue-800 transition-all shadow-[0_4px_12px_rgba(30,58,138,0.2)] active:scale-[0.98] uppercase tracking-wider flex items-center justify-center gap-2">
                   <i className="fa-solid fa-plus text-[10px]"></i> Adicionar Aluno
                 </button>
-                {currentStudent && (
-                  <div className={`bg-blue-50/50 p-4 rounded-xl border border-blue-100 mt-4 animate-slideIn transition-all duration-300 ${activeSection === 'dados' && isAdjusting ? 'relative z-[41] shadow-2xl bg-white border-blue-500 ring-4 ring-blue-500/10' : ''}`}>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="block text-[10px] font-black text-blue-900/60 uppercase tracking-widest">Ajuste de Nome (Manuscrito)</label>
-                      {activeSection === 'dados' && isAdjusting && <button onClick={() => { setIsAdjusting(false); setActiveSection(null); }} className="text-[8px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 uppercase">Ok</button>}
-                    </div>
-                    <input type="text" value={currentStudent.displayName || ''} onChange={(e) => updateStudentDisplayName(currentStudent.id, e.target.value)} className="w-full px-3 py-2 text-xs border-2 border-white rounded-lg shadow-sm bg-white focus:border-blue-500 outline-none transition-all placeholder:text-gray-300" placeholder="Ex: João da Silva" />
-                  </div>
-                )}
                 <div className="bg-gray-50 p-4 rounded-xl border-2 border-dashed border-gray-200 mt-4">
                   <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase tracking-widest">Importação Massiva (CSV)</label>
                   <textarea placeholder="João Silva, 123.456.789-00&#10;Maria Souza, 987.654.321-11" className="w-full h-24 text-xs p-3 border-none rounded-lg font-mono bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all" value={bulkInput} onChange={(e) => setBulkInput(e.target.value)} />
@@ -867,10 +851,7 @@ const App: React.FC = () => {
                         <div className="flex justify-between items-center mb-1"><label className="text-[10px] font-bold text-gray-500 uppercase">Título</label><span className="text-[10px] font-mono font-bold text-blue-600">{data.titleFontSize}px</span></div>
                         <input type="range" name="titleFontSize" min="20" max="150" value={data.titleFontSize} onChange={handleSliderChange} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
                       </div>
-                      <div>
-                        <div className="flex justify-between items-center mb-1"><label className="text-[10px] font-bold text-gray-500 uppercase">Nome (Manuscrito)</label><span className="text-[10px] font-mono font-bold text-blue-600">{data.highlightNameFontSize}px</span></div>
-                        <input type="range" name="highlightNameFontSize" min="20" max="150" value={data.highlightNameFontSize} onChange={handleSliderChange} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
-                      </div>
+
                     </div>
                   </div>
                   <div className="bg-white p-3 rounded border border-gray-200 space-y-3">
